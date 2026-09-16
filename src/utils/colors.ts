@@ -45,6 +45,15 @@ export const COLORS = {
   gradientCard: ['#0A315B', '#071B3A'],
   gradientIncome: ['#12C98A', '#08A976'],
   gradientExpense: ['#F21F38', '#D81730'],
+
+  petrol: '#07566A',
+  petrolDark: '#063B4A',
+  mint: '#B8F3DC',
+  mintLight: '#E9FFF6',
+  red: '#FF3D55',
+  redDark: '#E51F3D',
+  text: '#092C3A',
+  input: '#F2F8FC',
 };
 
 export type ColorType = typeof COLORS;

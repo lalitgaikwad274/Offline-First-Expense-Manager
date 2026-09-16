@@ -1,9 +1,9 @@
 import React from 'react';
-import { StatusBar, useColorScheme } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { store } from './src/store';
-import ExpenseDashboard from './src/components/ExpenseDashboard';
+import RootNavigator from './src/navigation/RootNavigator';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -12,10 +12,18 @@ function App() {
     <Provider store={store}>
       <SafeAreaProvider>
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <ExpenseDashboard />
+        <View style={styles.container}>
+          <RootNavigator />
+        </View>
       </SafeAreaProvider>
     </Provider>
   );
 }
 
 export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
