@@ -20,6 +20,12 @@ export const verticalScale = (size: number): number => {
   return (SCREEN_HEIGHT / BASE_HEIGHT) * size;
 };
 
+export function scalePxToDP(size: number) {
+  const newSize = size * SCREEN_WIDTH / 375;
+  return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 1
+
+}
+
 /**
  * Moderate scale helper for font sizes and padding with customizable factor
  */

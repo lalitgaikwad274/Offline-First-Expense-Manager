@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
-import { Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { BarChart3, CloudOff, CreditCard, Database, Grid2x2, Home, Receipt, Settings, ShieldCheck, Sparkles, Wallet, Wifi, X } from 'lucide-react-native';
+import { BarChart3, CloudOff, CreditCard, Database, Grid2x2, Home, LogOut, Receipt, Settings, ShieldCheck, Sparkles, Wallet, Wifi, X } from 'lucide-react-native';
+import { getAuth, signOut } from '@react-native-firebase/auth';
 import { COLORS, SHADOWS, moderateScale, wp } from '../utils/constants';
 import { UserProfile } from '../types/expense';
 
@@ -14,6 +15,7 @@ export interface DrawerNavigationProps {
   isOffline?: boolean;
   onToggleOffline?: () => void;
   totalExpensesCount?: number;
+  onLogout?: () => void;
 }
 
 interface DrawerMenuItem {
@@ -76,7 +78,29 @@ export const DrawerNavigation = memo(({
   isOffline = false,
   onToggleOffline,
   totalExpensesCount = 3,
+  onLogout,
 }: DrawerNavigationProps) => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+
+  const displayName = currentUser?.displayName || user?.name || 'User';
+  const initials =
+    user?.initials ||
+    (displayName
+      ? displayName
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2)
+      : 'L');
+
+  const handleLogoutPress = () => {
+    onClose();
+    if (onLogout) {
+      onLogout();
+    }
+  };
   return (
     <Modal
       visible={isOpen}
@@ -135,12 +159,12 @@ export const DrawerNavigation = memo(({
                 colors={COLORS.gradientAvatar}
                 style={styles.userAvatar}
               >
-                <Text style={styles.avatarText}>{user?.initials || 'L'}</Text>
+                <Text style={styles.avatarText}>{initials}</Text>
               </LinearGradient>
               <View style={styles.userInfo}>
-                <Text style={styles.userName}>{user?.name || 'Lalit Gaikwad'}</Text>
+                <Text style={styles.userName}>{displayName}</Text>
                 <Text style={styles.userRole}>
-                  {totalExpensesCount} active records
+                  {currentUser?.email || `${totalExpensesCount} active records`}
                 </Text>
               </View>
             </View>
@@ -222,6 +246,26 @@ export const DrawerNavigation = memo(({
                 );
               })}
             </View>
+
+            {/* Logout Option */}
+            <Pressable
+              onPress={handleLogoutPress}
+              style={({ pressed }) => [
+                styles.logoutButton,
+                pressed && styles.pressed,
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Log Out"
+            >
+              <View style={styles.logoutIconWrapper}>
+                <LogOut
+                  size={moderateScale(18)}
+                  color={COLORS.expense}
+                  strokeWidth={2.4}
+                />
+              </View>
+              <Text style={styles.logoutButtonText}>Log Out</Text>
+            </Pressable>
 
             {/* Footer */}
             <View style={styles.footer}>
@@ -439,6 +483,32 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(9),
     color: COLORS.lightGray,
     marginTop: 2,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.expenseLight,
+    paddingVertical: moderateScale(10),
+    paddingHorizontal: moderateScale(10),
+    borderRadius: moderateScale(14),
+    marginTop: moderateScale(16),
+    borderWidth: 1,
+    borderColor: 'rgba(242, 31, 56, 0.15)',
+  },
+  logoutIconWrapper: {
+    width: moderateScale(34),
+    height: moderateScale(34),
+    borderRadius: moderateScale(10),
+    backgroundColor: 'rgba(242, 31, 56, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutButtonText: {
+    marginLeft: moderateScale(12),
+    fontSize: moderateScale(13),
+    fontWeight: '700',
+    color: COLORS.expense,
+    flex: 1,
   },
   pressed: {
     opacity: 0.75,

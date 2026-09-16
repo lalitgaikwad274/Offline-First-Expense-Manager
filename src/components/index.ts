@@ -8,3 +8,4 @@ export * from './CategoryItem';
 export * from './ExpenseCard';
 export * from './BottomNavigation';
 export * from './ExpenseDashboard';
+export * from './AlertHost';

@@ -6,7 +6,8 @@ import { COLORS, moderateScale } from '../utils/constants';
 import { formatCurrency } from '../utils/helpers';
 
 export interface ExpenseCardProps {
-  item: Expense;
+  item?: Expense;
+  expense?: Expense;
   isLast?: boolean;
   onPress?: (expense: Expense) => void;
   onLongPress?: (expense: Expense) => void;
@@ -54,24 +55,28 @@ const getCategoryColor = (category: ExpenseCategory): string => {
 
 export const ExpenseCard = memo(({
   item,
+  expense,
   isLast = false,
   onPress,
   onLongPress,
 }: ExpenseCardProps) => {
-  const Icon = getCategoryIcon(item.category);
-  const iconColor = item.color || getCategoryColor(item.category);
+  const expenseData = item || expense;
+  if (!expenseData) return null;
+
+  const Icon = getCategoryIcon(expenseData.category);
+  const iconColor = expenseData.color || getCategoryColor(expenseData.category);
 
   return (
     <Pressable
-      onPress={() => onPress?.(item)}
-      onLongPress={() => onLongPress?.(item)}
+      onPress={() => onPress?.(expenseData)}
+      onLongPress={() => onLongPress?.(expenseData)}
       style={({ pressed }) => [
         styles.container,
         !isLast && styles.borderBottom,
         pressed && styles.pressed,
       ]}
       accessibilityRole="button"
-      accessibilityLabel={`${item.category}, ${item.amount} rupees`}
+      accessibilityLabel={`${expenseData.category}, ${expenseData.amount} rupees`}
     >
       {/* Category Icon */}
       <View style={[styles.iconWrapper, { backgroundColor: iconColor }]}>
@@ -86,20 +91,20 @@ export const ExpenseCard = memo(({
       <View style={styles.details}>
         <View style={styles.titleRow}>
           <Text style={styles.category} numberOfLines={1}>
-            {item.title || item.category}
+            {expenseData.title || expenseData.category}
           </Text>
-          {item.synced === false && (
+          {expenseData.synced === false && (
             <View style={styles.unsyncedBadge}>
               <CloudOff size={moderateScale(12)} color={COLORS.gray} />
             </View>
           )}
         </View>
-        <Text style={styles.date}>{item.date}</Text>
+        <Text style={styles.date}>{expenseData.date}</Text>
       </View>
 
       {/* Amount */}
       <Text style={styles.amount}>
-        - {formatCurrency(item.amount)}
+        - {formatCurrency(expenseData.amount)}
       </Text>
     </Pressable>
   );

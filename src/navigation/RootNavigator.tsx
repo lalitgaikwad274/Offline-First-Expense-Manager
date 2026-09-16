@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { getAuth, onAuthStateChanged, User } from '@react-native-firebase/auth';
@@ -7,6 +7,7 @@ import { getAuth, onAuthStateChanged, User } from '@react-native-firebase/auth';
 import AppNavigator from './AppNavigator';
 import AuthNavigator from './AuthNavigator';
 import { COLORS } from '../utils/colors';
+import SplashScreen from '../splash/SplashScreen';
 
 type RootStackParamList = {
   Auth: undefined;
@@ -17,6 +18,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
   const [initializing, setInitializing] = useState(true);
+  const [splashFinished, setSplashFinished] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -31,12 +33,8 @@ const RootNavigator = () => {
     return subscriber;
   }, [initializing]);
 
-  if (initializing) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.petrol} />
-      </View>
-    );
+  if (initializing || !splashFinished) {
+    return <SplashScreen onFinish={() => setSplashFinished(true)} />;
   }
 
   return (

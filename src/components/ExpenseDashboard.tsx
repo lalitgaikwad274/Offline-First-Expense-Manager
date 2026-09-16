@@ -14,6 +14,9 @@ import FinancialCard from './FinancialCard';
 import CategoryItem from './CategoryItem';
 import ExpenseCard from './ExpenseCard';
 import BottomNavigation from './BottomNavigation';
+import { getAuth, signOut } from '@react-native-firebase/auth';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { SCREEN_NAMES } from '../utils/screenNames';
 
 const QUICK_ACTIONS = [
   {
@@ -50,7 +53,39 @@ export const ExpenseDashboard: React.FC = () => {
     user,
   } = useAppSelector(state => state.expense);
 
+  const navigation = useNavigation<any>();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(setActiveTab('home'));
+    }, [dispatch])
+  );
+
+  const handleLogoutRequest = useCallback(() => {
+    setIsDrawerOpen(false);
+    setTimeout(() => {
+      Alert.alert(
+        'Log Out',
+        'Are you sure you want to log out of Expensio?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Log Out',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                const auth = getAuth();
+                await signOut(auth);
+              } catch (error: any) {
+                Alert.alert('Error', error?.message || 'Failed to log out');
+              }
+            },
+          },
+        ]
+      );
+    }, Platform.OS === 'android' ? 200 : 50);
+  }, []);
 
   // Compute financial metrics via Redux state
   const totalExpenses = useMemo(() => {
@@ -66,63 +101,15 @@ export const ExpenseDashboard: React.FC = () => {
     (actionId: string) => {
       switch (actionId) {
         case 'add':
-          Alert.prompt
-            ? Alert.prompt(
-              'Add New Expense',
-              'Enter amount in ₹:',
-              [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                  text: 'Add',
-                  onPress: (text) => {
-                    const amount = parseFloat(text || '0');
-                    if (amount > 0) {
-                      const newExp: Expense = {
-                        id: String(Date.now()),
-                        title: 'Quick Expense',
-                        category: 'Food & Dining',
-                        amount,
-                        date: 'Just now',
-                        synced: !isOffline,
-                      };
-                      dispatch(addExpense(newExp));
-                    }
-                  },
-                },
-              ],
-              'plain-text',
-              '',
-              'numeric'
-            )
-            : Alert.alert(
-              'Add Expense',
-              'Quick action to record a new transaction with Redux and local SQLite cache.',
-              [
-                {
-                  text: 'Add ₹250 (Food)',
-                  onPress: () => {
-                    const newExp: Expense = {
-                      id: String(Date.now()),
-                      title: 'Coffee & Snacks',
-                      category: 'Food & Dining',
-                      amount: 250,
-                      date: 'Just now',
-                      synced: !isOffline,
-                    };
-                    dispatch(addExpense(newExp));
-                  },
-                },
-                { text: 'Cancel', style: 'cancel' },
-              ]
-            );
+          navigation.navigate(SCREEN_NAMES.ADD_EXPENSE);
           break;
 
         case 'transactions':
-          dispatch(setActiveTab('transactions'));
+          navigation.navigate(SCREEN_NAMES.TRANSACTIONS);
           break;
 
         case 'analytics':
-          dispatch(setActiveTab('analytics'));
+          navigation.navigate(SCREEN_NAMES.ANALYTICS);
           break;
 
         case 'categories':
@@ -136,7 +123,7 @@ export const ExpenseDashboard: React.FC = () => {
           break;
       }
     },
-    [dispatch, isOffline]
+    [navigation]
   );
 
   const handlePeriodChange = useCallback(() => {
@@ -159,34 +146,68 @@ export const ExpenseDashboard: React.FC = () => {
   const handleTabPress = useCallback(
     (tabId: string) => {
       dispatch(setActiveTab(tabId));
+      switch (tabId) {
+        case 'home':
+          break;
+        case 'transactions':
+          navigation.navigate(SCREEN_NAMES.TRANSACTIONS);
+          break;
+        case 'analytics':
+          navigation.navigate(SCREEN_NAMES.ANALYTICS);
+          break;
+        case 'profile':
+          navigation.navigate(SCREEN_NAMES.PROFILE);
+          break;
+      }
     },
-    [dispatch]
+    [dispatch, navigation]
   );
 
   const handleDrawerSelect = useCallback(
     (itemId: string) => {
-      if (itemId === 'database') {
-        Alert.alert(
-          'Offline SQLite Database',
-          `Active Records: ${expenses.length}\nSync Engine: Active\nPending Syncs: ${expenses.filter(e => !e.synced).length
-          }`
-        );
-      } else if (itemId === 'security') {
-        Alert.alert('Security & Backup', 'AES-256 local encryption enabled.');
-      } else {
-        dispatch(setActiveTab(itemId));
+      switch (itemId) {
+        case 'home':
+          dispatch(setActiveTab('home'));
+          break;
+        case 'transactions':
+          navigation.navigate(SCREEN_NAMES.TRANSACTIONS);
+          break;
+        case 'analytics':
+          navigation.navigate(SCREEN_NAMES.ANALYTICS);
+          break;
+        case 'settings':
+          navigation.navigate(SCREEN_NAMES.PROFILE);
+          break;
+        case 'cards':
+          navigation.navigate(SCREEN_NAMES.TRANSACTIONS);
+          break;
+        case 'database':
+          Alert.alert(
+            'Offline SQLite Database',
+            `Active Records: ${expenses.length}\nSync Engine: Active\nPending Syncs: ${
+              expenses.filter(e => !e.synced).length
+            }`
+          );
+          break;
+        case 'security':
+          Alert.alert('Security & Backup', 'AES-256 local encryption enabled.');
+          break;
+        default:
+          dispatch(setActiveTab(itemId));
+          break;
       }
     },
-    [dispatch, expenses]
+    [dispatch, navigation, expenses]
   );
 
-  const handleExpensePress = useCallback((item: Expense) => {
-    Alert.alert(
-      item.title || item.category,
-      `Category: ${item.category}\nAmount: ₹${item.amount}\nDate: ${item.date}\nSync Status: ${item.synced ? 'Synced with cloud' : 'Stored locally in offline queue'
-      }`
-    );
-  }, []);
+  const handleExpensePress = useCallback(
+    (item: Expense) => {
+      navigation.navigate(SCREEN_NAMES.EXPENSE_DETAILS, {
+        expenseId: item.id,
+      });
+    },
+    [navigation]
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -202,6 +223,7 @@ export const ExpenseDashboard: React.FC = () => {
         isOffline={isOffline}
         onToggleOffline={handleToggleOffline}
         totalExpensesCount={expenses.length}
+        onLogout={handleLogoutRequest}
       />
 
       <View style={styles.container}>
@@ -269,7 +291,7 @@ export const ExpenseDashboard: React.FC = () => {
                 <Text style={styles.sectionTitle}>Recent Expenses</Text>
                 <Pressable
                   hitSlop={8}
-                  onPress={() => dispatch(setActiveTab('transactions'))}
+                  onPress={() => navigation.navigate(SCREEN_NAMES.TRANSACTIONS)}
                 >
                   <Text style={styles.seeAll}>See All</Text>
                 </Pressable>
@@ -288,7 +310,7 @@ export const ExpenseDashboard: React.FC = () => {
 
         {/* Reusable Bottom Navigation */}
         <BottomNavigation
-          activeTab={activeTab}
+          activeTab="home"
           onTabPress={handleTabPress}
         />
       </View>
