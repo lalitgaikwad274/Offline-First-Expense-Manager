@@ -1,0 +1,347 @@
+import React, { useCallback, useMemo, useState } from 'react';
+import { Alert, FlatList, Platform, Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { BarChart3, Grid2x2, Plus, Receipt } from 'lucide-react-native';
+import { useAppDispatch, useAppSelector } from '../store';
+import { addExpense, setActiveTab, setSelectedPeriod, toggleOffline } from '../store/expenseSlice';
+import { Expense } from '../types/expense';
+import { COLORS, SPACING, TYPOGRAPHY, moderateScale } from '../utils/constants';
+// Modular Components
+import Header from './Header';
+import DrawerNavigation from './DrawerNavigation';
+import OfflineBanner from './OfflineBanner';
+import SummaryCard from './SummaryCard';
+import FinancialCard from './FinancialCard';
+import CategoryItem from './CategoryItem';
+import ExpenseCard from './ExpenseCard';
+import BottomNavigation from './BottomNavigation';
+
+const QUICK_ACTIONS = [
+  {
+    id: 'add',
+    title: 'Add\nExpense',
+    icon: Plus,
+    isPrimary: true,
+  },
+  {
+    id: 'transactions',
+    title: 'View\nTransactions',
+    icon: Receipt,
+  },
+  {
+    id: 'analytics',
+    title: 'Analytics\nStats',
+    icon: BarChart3,
+  },
+  {
+    id: 'categories',
+    title: 'Browse\nCategories',
+    icon: Grid2x2,
+  },
+];
+
+export const ExpenseDashboard: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const {
+    expenses,
+    income,
+    isOffline,
+    selectedPeriod,
+    activeTab,
+    user,
+  } = useAppSelector(state => state.expense);
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Compute financial metrics via Redux state
+  const totalExpenses = useMemo(() => {
+    return expenses.reduce((sum, item) => sum + item.amount, 0);
+  }, [expenses]);
+
+  const balance = useMemo(() => {
+    return income - totalExpenses;
+  }, [income, totalExpenses]);
+
+  // Handlers
+  const handleQuickAction = useCallback(
+    (actionId: string) => {
+      switch (actionId) {
+        case 'add':
+          Alert.prompt
+            ? Alert.prompt(
+              'Add New Expense',
+              'Enter amount in ₹:',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Add',
+                  onPress: (text) => {
+                    const amount = parseFloat(text || '0');
+                    if (amount > 0) {
+                      const newExp: Expense = {
+                        id: String(Date.now()),
+                        title: 'Quick Expense',
+                        category: 'Food & Dining',
+                        amount,
+                        date: 'Just now',
+                        synced: !isOffline,
+                      };
+                      dispatch(addExpense(newExp));
+                    }
+                  },
+                },
+              ],
+              'plain-text',
+              '',
+              'numeric'
+            )
+            : Alert.alert(
+              'Add Expense',
+              'Quick action to record a new transaction with Redux and local SQLite cache.',
+              [
+                {
+                  text: 'Add ₹250 (Food)',
+                  onPress: () => {
+                    const newExp: Expense = {
+                      id: String(Date.now()),
+                      title: 'Coffee & Snacks',
+                      category: 'Food & Dining',
+                      amount: 250,
+                      date: 'Just now',
+                      synced: !isOffline,
+                    };
+                    dispatch(addExpense(newExp));
+                  },
+                },
+                { text: 'Cancel', style: 'cancel' },
+              ]
+            );
+          break;
+
+        case 'transactions':
+          dispatch(setActiveTab('transactions'));
+          break;
+
+        case 'analytics':
+          dispatch(setActiveTab('analytics'));
+          break;
+
+        case 'categories':
+          Alert.alert(
+            'Categories',
+            'Categories: Food & Dining, Transport, Shopping, Bills & Utilities, Health, Travel, Entertainment'
+          );
+          break;
+
+        default:
+          break;
+      }
+    },
+    [dispatch, isOffline]
+  );
+
+  const handlePeriodChange = useCallback(() => {
+    const periods = ['This Month', 'Last Month', 'This Quarter', 'This Year'];
+    const nextIndex =
+      (periods.indexOf(selectedPeriod) + 1) % periods.length;
+    dispatch(setSelectedPeriod(periods[nextIndex]));
+  }, [dispatch, selectedPeriod]);
+
+  const handleToggleOffline = useCallback(() => {
+    dispatch(toggleOffline());
+    Alert.alert(
+      'Network Mode Toggled',
+      isOffline
+        ? 'Status: Online. Background sync engine running.'
+        : 'Status: Offline mode enabled. Transactions saved locally in SQLite.'
+    );
+  }, [dispatch, isOffline]);
+
+  const handleTabPress = useCallback(
+    (tabId: string) => {
+      dispatch(setActiveTab(tabId));
+    },
+    [dispatch]
+  );
+
+  const handleDrawerSelect = useCallback(
+    (itemId: string) => {
+      if (itemId === 'database') {
+        Alert.alert(
+          'Offline SQLite Database',
+          `Active Records: ${expenses.length}\nSync Engine: Active\nPending Syncs: ${expenses.filter(e => !e.synced).length
+          }`
+        );
+      } else if (itemId === 'security') {
+        Alert.alert('Security & Backup', 'AES-256 local encryption enabled.');
+      } else {
+        dispatch(setActiveTab(itemId));
+      }
+    },
+    [dispatch, expenses]
+  );
+
+  const handleExpensePress = useCallback((item: Expense) => {
+    Alert.alert(
+      item.title || item.category,
+      `Category: ${item.category}\nAmount: ₹${item.amount}\nDate: ${item.date}\nSync Status: ${item.synced ? 'Synced with cloud' : 'Stored locally in offline queue'
+      }`
+    );
+  }, []);
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" />
+
+      {/* Drawer Navigation */}
+      <DrawerNavigation
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        activeItem={activeTab}
+        onSelectItem={handleDrawerSelect}
+        user={user}
+        isOffline={isOffline}
+        onToggleOffline={handleToggleOffline}
+        totalExpensesCount={expenses.length}
+      />
+
+      <View style={styles.container}>
+        <FlatList
+          data={expenses}
+          keyExtractor={item => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.contentContainer}
+          ListHeaderComponent={
+            <>
+              {/* Header with Top-Left Drawer Button & Clickable Logo */}
+              <Header
+                userName={user.name}
+                userInitials={user.initials}
+                notificationCount={user.notificationCount}
+                onOpenDrawer={() => setIsDrawerOpen(true)}
+                onNotificationPress={() =>
+                  Alert.alert('Notifications', 'You have 1 pending transaction to sync.')
+                }
+                onProfilePress={() => dispatch(setActiveTab('profile'))}
+              />
+
+              {/* Offline Notice Banner */}
+              {isOffline && (
+                <OfflineBanner
+                  onPress={handleToggleOffline}
+                  title="You are offline"
+                  subtitle="Your data will sync automatically when you're back online. Tap to toggle."
+                />
+              )}
+
+              {/* Expense Gradient Summary Card */}
+              <SummaryCard
+                totalAmount={totalExpenses}
+                selectedPeriod={selectedPeriod}
+                trendPercentage={12}
+                onPeriodPress={handlePeriodChange}
+              />
+
+              {/* Financial Metrics (Income & Balance) */}
+              <View style={styles.financialRow}>
+                <FinancialCard type="income" amount={income} />
+                <FinancialCard type="balance" amount={balance} />
+              </View>
+
+              {/* Quick Actions Grid */}
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Quick Actions</Text>
+                <View style={styles.quickActions}>
+                  {QUICK_ACTIONS.map(item => (
+                    <CategoryItem
+                      key={item.id}
+                      id={item.id}
+                      title={item.title}
+                      icon={item.icon}
+                      isPrimary={item.isPrimary}
+                      onPress={handleQuickAction}
+                    />
+                  ))}
+                </View>
+              </View>
+
+              {/* Recent Transactions List Header */}
+              <View style={styles.recentHeader}>
+                <Text style={styles.sectionTitle}>Recent Expenses</Text>
+                <Pressable
+                  hitSlop={8}
+                  onPress={() => dispatch(setActiveTab('transactions'))}
+                >
+                  <Text style={styles.seeAll}>See All</Text>
+                </Pressable>
+              </View>
+            </>
+          }
+          renderItem={({ item, index }) => (
+            <ExpenseCard
+              item={item}
+              isLast={index === expenses.length - 1}
+              onPress={handleExpensePress}
+            />
+          )}
+          ListFooterComponent={<View style={styles.footerSpace} />}
+        />
+
+        {/* Reusable Bottom Navigation */}
+        <BottomNavigation
+          activeTab={activeTab}
+          onTabPress={handleTabPress}
+        />
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  contentContainer: {
+    paddingHorizontal: SPACING.screenPaddingHorizontal,
+    paddingTop: SPACING.screenPaddingVertical,
+  },
+  financialRow: {
+    flexDirection: 'row',
+    gap: SPACING.gapMedium,
+    marginBottom: SPACING.lg,
+  },
+  section: {
+    marginBottom: SPACING.xl,
+  },
+  sectionTitle: {
+    ...TYPOGRAPHY.h2,
+    color: COLORS.navy,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginTop: moderateScale(14),
+  },
+  recentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.sm,
+  },
+  seeAll: {
+    color: COLORS.expense,
+    fontSize: moderateScale(15),
+    fontWeight: '800',
+  },
+  footerSpace: {
+    height: moderateScale(30),
+  },
+});
+
+export default ExpenseDashboard;
