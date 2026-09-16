@@ -1,7 +1,9 @@
 import React, { memo } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { BarChart3, Home, List, User } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 import { COLORS, SHADOWS, moderateScale } from '../utils/constants';
+import { SCREEN_NAMES } from '../utils/screenNames';
 
 export interface TabItem {
   id: string;
@@ -43,6 +45,32 @@ export const BottomNavigation = memo(({
   tabs = DEFAULT_TABS,
   onTabPress,
 }: BottomNavigationProps) => {
+  const navigation = useNavigation<any>();
+
+  const handlePress = (tabId: string) => {
+    if (onTabPress) {
+      onTabPress(tabId);
+      return;
+    }
+
+    if (tabId === activeTab) return;
+
+    switch (tabId) {
+      case 'home':
+        navigation.navigate(SCREEN_NAMES.HOME);
+        break;
+      case 'transactions':
+        navigation.navigate(SCREEN_NAMES.TRANSACTIONS);
+        break;
+      case 'analytics':
+        navigation.navigate(SCREEN_NAMES.ANALYTICS);
+        break;
+      case 'profile':
+        navigation.navigate(SCREEN_NAMES.PROFILE);
+        break;
+    }
+  };
+
   return (
     <View style={styles.container}>
       {tabs.map(tab => {
@@ -52,7 +80,7 @@ export const BottomNavigation = memo(({
         return (
           <Pressable
             key={tab.id}
-            onPress={() => onTabPress?.(tab.id)}
+            onPress={() => handlePress(tab.id)}
             style={({ pressed }) => [
               styles.tabItem,
               pressed && styles.pressed,
