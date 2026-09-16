@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,10 +10,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  Image
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from '@react-native-firebase/auth';
+import { scalePxToDP } from '../../utils/responsive';
 
 
 const COLORS = {
@@ -28,7 +30,7 @@ const COLORS = {
   placeholder: '#8CA2AA',
 };
 
-const RegisterScreen = ({navigation}: any) => {
+const RegisterScreen = ({ navigation }: any) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -140,7 +142,7 @@ const RegisterScreen = ({navigation}: any) => {
             'rgba(184,243,220,0.55)',
             'rgba(37,220,192,0.18)',
           ]}
-          // style={StyleSheet.absoluteFillObject}
+        // style={StyleSheet.absoluteFillObject}
         />
       </View>
 
@@ -150,7 +152,7 @@ const RegisterScreen = ({navigation}: any) => {
             'rgba(255,255,255,0.22)',
             'rgba(37,220,192,0.08)',
           ]}
-          // style={StyleSheet.absoluteFillObject}
+        // style={StyleSheet.absoluteFillObject}
         />
       </View>
 
@@ -164,16 +166,17 @@ const RegisterScreen = ({navigation}: any) => {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled">
-            
+
             {/* Header */}
             <View style={styles.header}>
               <TouchableOpacity
                 style={styles.backButton}
                 onPress={() => navigation?.goBack?.()}>
-                <Ionicons
-                  name="arrow-back"
-                  size={21}
-                  color={COLORS.white}
+                <Image source={require('../../Assets/icons/back.png')}
+                  style={{
+                    height: scalePxToDP(24),
+                    width: scalePxToDP(24),
+                  }}
                 />
               </TouchableOpacity>
 
@@ -199,10 +202,12 @@ const RegisterScreen = ({navigation}: any) => {
               {/* Name */}
               <View style={styles.inputWrapper}>
                 <View style={styles.iconContainer}>
-                  <Ionicons
-                    name="person-outline"
-                    size={20}
-                    color={COLORS.petrol}
+                  <Image
+                    source={require('../../Assets/icons/user.png')}
+                    style={{
+                      height: scalePxToDP(18),
+                      width: scalePxToDP(18),
+                    }}
                   />
                 </View>
 
@@ -219,10 +224,12 @@ const RegisterScreen = ({navigation}: any) => {
               {/* Email */}
               <View style={styles.inputWrapper}>
                 <View style={styles.iconContainer}>
-                  <Ionicons
-                    name="mail-outline"
-                    size={20}
-                    color={COLORS.petrol}
+                  <Image
+                    source={require('../../Assets/icons/mail.png')}
+                    style={{
+                      height: scalePxToDP(18),
+                      width: scalePxToDP(18),
+                    }}
                   />
                 </View>
 
@@ -240,10 +247,12 @@ const RegisterScreen = ({navigation}: any) => {
               {/* Password */}
               <View style={styles.inputWrapper}>
                 <View style={styles.iconContainer}>
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={20}
-                    color={COLORS.petrol}
+                  <Image
+                    source={require('../../Assets/icons/padlock.png')}
+                    style={{
+                      height: scalePxToDP(18),
+                      width: scalePxToDP(18),
+                    }}
                   />
                 </View>
 
@@ -258,10 +267,12 @@ const RegisterScreen = ({navigation}: any) => {
 
                 <TouchableOpacity
                   onPress={() => setShowPassword(!showPassword)}>
-                  <Ionicons
-                    name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-                    size={21}
-                    color={COLORS.placeholder}
+                  <Image
+                    source={showConfirmPassword ? require('../../Assets/icons/see.png') : require('../../Assets/icons/not-visible.png')}
+                    style={{
+                      height: scalePxToDP(18),
+                      width: scalePxToDP(18),
+                    }}
                   />
                 </TouchableOpacity>
               </View>
@@ -269,10 +280,12 @@ const RegisterScreen = ({navigation}: any) => {
               {/* Confirm Password */}
               <View style={styles.inputWrapper}>
                 <View style={styles.iconContainer}>
-                  <Ionicons
-                    name="shield-checkmark-outline"
-                    size={20}
-                    color={COLORS.petrol}
+                  <Image
+                    source={require('../../Assets/icons/padlock.png')}
+                    style={{
+                      height: scalePxToDP(18),
+                      width: scalePxToDP(18),
+                    }}
                   />
                 </View>
 
@@ -289,14 +302,12 @@ const RegisterScreen = ({navigation}: any) => {
                   onPress={() =>
                     setShowConfirmPassword(!showConfirmPassword)
                   }>
-                  <Ionicons
-                    name={
-                      showConfirmPassword
-                        ? 'eye-outline'
-                        : 'eye-off-outline'
-                    }
-                    size={21}
-                    color={COLORS.placeholder}
+                  <Image
+                    source={showConfirmPassword ? require('../../Assets/icons/see.png') : require('../../Assets/icons/not-visible.png')}
+                    style={{
+                      height: scalePxToDP(18),
+                      width: scalePxToDP(18),
+                    }}
                   />
                 </TouchableOpacity>
               </View>
@@ -312,10 +323,14 @@ const RegisterScreen = ({navigation}: any) => {
                     agree && styles.checkboxSelected,
                   ]}>
                   {agree && (
-                    <Ionicons
-                      name="checkmark"
-                      size={15}
-                      color={COLORS.white}
+                    <Image
+                      source={require('../../Assets/icons/check-mark.png')}
+                      style={{
+                        height: scalePxToDP(16),
+                        width: scalePxToDP(16),
+                        resizeMode: "contain",
+                        tintColor: "#FFF",
+                      }}
                     />
                   )}
                 </View>
@@ -335,17 +350,21 @@ const RegisterScreen = ({navigation}: any) => {
                 onPress={handleRegister}>
                 <LinearGradient
                   colors={['#FF5D65', '#FF4B55', '#E83E48']}
-                  start={{x: 0, y: 0}}
-                  end={{x: 1, y: 1}}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
                   style={styles.registerButton}>
                   <Text style={styles.registerButtonText}>
                     Create Account
                   </Text>
 
-                  <Ionicons
-                    name="arrow-forward"
-                    size={20}
-                    color={COLORS.white}
+                  <Image
+                    source={require('../../Assets/icons/add-user.png')}
+                    style={{
+                      height: scalePxToDP(24),
+                      width: scalePxToDP(24),
+                      resizeMode: "contain",
+                      tintColor: "#FFF"
+                    }}
                   />
                 </LinearGradient>
               </TouchableOpacity>
@@ -362,15 +381,23 @@ const RegisterScreen = ({navigation}: any) => {
               {/* Social Buttons */}
               <View style={styles.socialContainer}>
                 <TouchableOpacity style={styles.socialButton}>
-                  <Text style={styles.googleG}>G</Text>
+                  <Image
+                    source={require('../../Assets/icons/google.webp')}
+                    style={{
+                      height: scalePxToDP(50),
+                      width: scalePxToDP(50),
+                    }}
+                  />
                   <Text style={styles.socialText}>Google</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.socialButton}>
-                  <Ionicons
-                    name="logo-apple"
-                    size={21}
-                    color={COLORS.navy}
+                  <Image
+                    source={require('../../Assets/icons/apple.webp')}
+                    style={{
+                      height: scalePxToDP(30),
+                      width: scalePxToDP(30),
+                    }}
                   />
                   <Text style={styles.socialText}>Apple</Text>
                 </TouchableOpacity>

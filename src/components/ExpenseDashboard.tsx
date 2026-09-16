@@ -14,6 +14,7 @@ import FinancialCard from './FinancialCard';
 import CategoryItem from './CategoryItem';
 import ExpenseCard from './ExpenseCard';
 import BottomNavigation from './BottomNavigation';
+import { getAuth, signOut } from '@react-native-firebase/auth';
 
 const QUICK_ACTIONS = [
   {
@@ -51,6 +52,31 @@ export const ExpenseDashboard: React.FC = () => {
   } = useAppSelector(state => state.expense);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const handleLogoutRequest = useCallback(() => {
+    setIsDrawerOpen(false);
+    setTimeout(() => {
+      Alert.alert(
+        'Log Out',
+        'Are you sure you want to log out of Expensio?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Log Out',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                const auth = getAuth();
+                await signOut(auth);
+              } catch (error: any) {
+                Alert.alert('Error', error?.message || 'Failed to log out');
+              }
+            },
+          },
+        ]
+      );
+    }, Platform.OS === 'android' ? 200 : 50);
+  }, []);
 
   // Compute financial metrics via Redux state
   const totalExpenses = useMemo(() => {
@@ -202,6 +228,7 @@ export const ExpenseDashboard: React.FC = () => {
         isOffline={isOffline}
         onToggleOffline={handleToggleOffline}
         totalExpensesCount={expenses.length}
+        onLogout={handleLogoutRequest}
       />
 
       <View style={styles.container}>
