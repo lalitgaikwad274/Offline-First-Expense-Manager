@@ -126,6 +126,7 @@ const AddExpenseScreen: React.FC = () => {
                 placeholderTextColor="rgba(17, 34, 47, 0.25)"
                 keyboardType="numeric"
                 autoFocus
+                caretHidden={true}
               />
             </View>
           </View>
