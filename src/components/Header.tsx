@@ -55,7 +55,7 @@ export const Header = memo(({
           </Pressable>
 
           {/* Clickable Logo with Alert */}
-          <Pressable
+          {/* <Pressable
             onPress={handleLogoPress}
             hitSlop={8}
             style={({ pressed }) => [
@@ -80,7 +80,15 @@ export const Header = memo(({
               </View>
               <Text style={styles.logoSubtitle}>Offline-First</Text>
             </View>
-          </Pressable>
+          </Pressable> */}
+          <View style={styles.greetingRow}>
+            <View style={styles.greetingContainer}>
+              <Text style={styles.helloText}>Hello,</Text>
+              <Text style={styles.userName}>
+                {userName} <Text style={styles.wave}>👋</Text>
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* Top Right: Notifications & Profile */}
@@ -101,7 +109,7 @@ export const Header = memo(({
             </View>
           </Pressable>
 
-          <Pressable
+          {/* <Pressable
             onPress={onProfilePress}
             hitSlop={8}
             style={({ pressed }) => [
@@ -117,19 +125,19 @@ export const Header = memo(({
             >
               <Text style={styles.avatarText}>{userInitials}</Text>
             </LinearGradient>
-          </Pressable>
+          </Pressable> */}
         </View>
       </View>
 
       {/* Greeting Row */}
-      <View style={styles.greetingRow}>
+      {/* <View style={styles.greetingRow}>
         <View style={styles.greetingContainer}>
           <Text style={styles.helloText}>Hello,</Text>
           <Text style={styles.userName}>
             {userName} <Text style={styles.wave}>👋</Text>
           </Text>
         </View>
-      </View>
+      </View> */}
     </View>
   );
 });
@@ -242,20 +250,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   helloText: {
-    fontSize: moderateScale(14),
-    lineHeight: moderateScale(18),
+    fontSize: moderateScale(10),
+    // lineHeight: moderateScale(18),
     color: COLORS.textSecondary,
     fontWeight: '600',
   },
   userName: {
-    marginTop: 1,
-    fontSize: moderateScale(24),
-    lineHeight: moderateScale(28),
+    // marginTop: 1,
+    fontSize: moderateScale(16),
+    // lineHeight: moderateScale(28),
     color: COLORS.navy,
     fontWeight: '800',
   },
   wave: {
-    fontSize: moderateScale(22),
+    fontSize: moderateScale(16),
   },
   pressed: {
     opacity: 0.72,

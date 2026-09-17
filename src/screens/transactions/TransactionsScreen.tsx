@@ -220,7 +220,8 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: moderateScale(16),
-    paddingVertical: moderateScale(10),
+    paddingTop: moderateScale(10),
+    paddingBottom: moderateScale(95),
   },
   emptyContainer: {
     flex: 1,

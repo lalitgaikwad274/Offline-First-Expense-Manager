@@ -25,46 +25,50 @@ export const SummaryCard = memo(({
       end={{ x: 1, y: 1 }}
       style={styles.card}
     >
-      {/* Top row: Title and Month Selector */}
-      <View style={styles.headerRow}>
-        <Text style={styles.title}>Total Expenses</Text>
+      <View style={styles.cardContainer}>
 
-        <Pressable
-          onPress={onPeriodPress}
-          hitSlop={6}
-          style={({ pressed }) => [
-            styles.periodSelector,
-            pressed && styles.pressed,
-          ]}
-        >
-          <Text style={styles.periodText}>{selectedPeriod}</Text>
-          <ChevronDown
-            size={moderateScale(18)}
-            color={COLORS.white}
-            strokeWidth={2.5}
-          />
-        </Pressable>
-      </View>
 
-      {/* Bottom row: Total Amount, Trend, Micro Chart */}
-      <View style={styles.bottomRow}>
-        <Text style={styles.amountText} numberOfLines={1} adjustsFontSizeToFit>
-          {formatCurrency(totalAmount)}
-        </Text>
+        {/* Top row: Title and Month Selector */}
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Total Expenses</Text>
 
-        <View style={styles.trendContainer}>
-          <TrendingUp
-            size={moderateScale(22)}
-            color="#FF5061"
-            strokeWidth={3}
-          />
-          <Text style={styles.trendText}>{trendPercentage}%</Text>
+          <Pressable
+            onPress={onPeriodPress}
+            hitSlop={6}
+            style={({ pressed }) => [
+              styles.periodSelector,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.periodText}>{selectedPeriod}</Text>
+            <ChevronDown
+              size={moderateScale(18)}
+              color={COLORS.white}
+              strokeWidth={2.5}
+            />
+          </Pressable>
         </View>
 
-        <View style={styles.chartBars}>
-          <View style={[styles.chartBar, { height: moderateScale(16) }]} />
-          <View style={[styles.chartBar, { height: moderateScale(28) }]} />
-          <View style={[styles.chartBar, { height: moderateScale(40) }]} />
+        {/* Bottom row: Total Amount, Trend, Micro Chart */}
+        <View style={styles.bottomRow}>
+          <Text style={styles.amountText} numberOfLines={1} adjustsFontSizeToFit>
+            {formatCurrency(totalAmount)}
+          </Text>
+
+          <View style={styles.trendContainer}>
+            <TrendingUp
+              size={moderateScale(22)}
+              color="#FF5061"
+              strokeWidth={3}
+            />
+            <Text style={styles.trendText}>{trendPercentage}%</Text>
+          </View>
+
+          <View style={styles.chartBars}>
+            <View style={[styles.chartBar, { height: moderateScale(16) }]} />
+            <View style={[styles.chartBar, { height: moderateScale(28) }]} />
+            <View style={[styles.chartBar, { height: moderateScale(40) }]} />
+          </View>
         </View>
       </View>
     </LinearGradient>
@@ -73,14 +77,17 @@ export const SummaryCard = memo(({
 
 const styles = StyleSheet.create({
   card: {
+    width: '100%',
     minHeight: moderateScale(155),
     borderRadius: SPACING.cardRadius,
-    paddingHorizontal: moderateScale(20),
-    paddingVertical: moderateScale(18),
     marginBottom: SPACING.lg,
     overflow: 'hidden',
     justifyContent: 'space-between',
     ...SHADOWS.medium,
+  },
+  cardContainer: {
+    paddingHorizontal: moderateScale(20),
+    paddingVertical: moderateScale(18),
   },
   headerRow: {
     flexDirection: 'row',

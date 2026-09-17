@@ -36,7 +36,10 @@ const CATEGORIES: { label: ExpenseCategory; color: string }[] = [
   { label: 'Entertainment', color: '#845EF7' },
   { label: 'Health', color: '#F06595' },
   { label: 'Travel', color: '#20C997' },
+  { label: 'mutual funds', color: '#FF6B6B' },
+  { label: 'Loans', color: '#FF6B6B' },
   { label: 'Other', color: '#868E96' },
+
 ];
 
 const AddExpenseScreen: React.FC = () => {
@@ -86,7 +89,7 @@ const AddExpenseScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <StatusBar barStyle="dark-content" />
 
       {/* Screen Header */}
       <View style={styles.header}>

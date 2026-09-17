@@ -6,6 +6,8 @@ export type ExpenseCategory =
   | 'Entertainment'
   | 'Health'
   | 'Travel'
+  | 'mutual funds'
+  | 'Loans'
   | 'Other';
 
 export interface Expense {

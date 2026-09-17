@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: moderateScale(16),
     paddingTop: moderateScale(8),
-    paddingBottom: moderateScale(24),
+    paddingBottom: moderateScale(100),
   },
   heroCard: {
     backgroundColor: COLORS.white,

@@ -46,6 +46,15 @@ export const COLORS = {
   gradientIncome: ['#12C98A', '#08A976'],
   gradientExpense: ['#F21F38', '#D81730'],
 
+  // Bottom Navigation & Floating Action Button
+  navBackground: '#FFFFFF',
+  navBorder: '#F0F4F9',
+  navActive: '#2F80ED',
+  navInactive: '#8FA2B7',
+  navFabBg: '#F21F38',
+  navFabHalo: '#FFEBEF',
+  navFabShadow: 'rgba(242, 31, 56, 0.35)',
+
   petrol: '#07566A',
   petrolDark: '#063B4A',
   mint: '#B8F3DC',

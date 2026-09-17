@@ -1,5 +1,18 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Alert, FlatList, Platform, Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import {
+  Alert,
+  Animated,
+  FlatList,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Platform,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BarChart3, Grid2x2, Plus, Receipt } from 'lucide-react-native';
 import { useAppDispatch, useAppSelector } from '../store';
 import { addExpense, setActiveTab, setSelectedPeriod, toggleOffline } from '../store/expenseSlice';
@@ -27,7 +40,7 @@ const QUICK_ACTIONS = [
   },
   {
     id: 'transactions',
-    title: 'View\nTransactions',
+    title: 'Passbook',
     icon: Receipt,
   },
   {
@@ -152,6 +165,9 @@ export const ExpenseDashboard: React.FC = () => {
         case 'transactions':
           navigation.navigate(SCREEN_NAMES.TRANSACTIONS);
           break;
+        case 'add':
+          navigation.navigate(SCREEN_NAMES.ADD_EXPENSE);
+          break;
         case 'analytics':
           navigation.navigate(SCREEN_NAMES.ANALYTICS);
           break;
@@ -184,8 +200,7 @@ export const ExpenseDashboard: React.FC = () => {
         case 'database':
           Alert.alert(
             'Offline SQLite Database',
-            `Active Records: ${expenses.length}\nSync Engine: Active\nPending Syncs: ${
-              expenses.filter(e => !e.synced).length
+            `Active Records: ${expenses.length}\nSync Engine: Active\nPending Syncs: ${expenses.filter(e => !e.synced).length
             }`
           );
           break;
@@ -209,8 +224,59 @@ export const ExpenseDashboard: React.FC = () => {
     [navigation]
   );
 
+  const navTranslateY = useRef(new Animated.Value(0)).current;
+  const lastScrollOffset = useRef(0);
+  const isHidden = useRef(false);
+
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const currentOffset = event.nativeEvent.contentOffset.y;
+      const diff = currentOffset - lastScrollOffset.current;
+
+      // When at the very top of dashboard, always restore navigation
+      if (currentOffset <= 20) {
+        if (isHidden.current) {
+          isHidden.current = false;
+          Animated.spring(navTranslateY, {
+            toValue: 0,
+            friction: 8,
+            tension: 50,
+            useNativeDriver: true,
+          }).start();
+        }
+      } else if (diff > 12 && currentOffset > 60) {
+        // Scrolling down -> smoothly slide down to hide
+        if (!isHidden.current) {
+          isHidden.current = true;
+          Animated.timing(navTranslateY, {
+            toValue: 130,
+            duration: 220,
+            useNativeDriver: true,
+          }).start();
+        }
+      } else if (diff < -12) {
+        // Scrolling up -> smoothly slide back up
+        if (isHidden.current) {
+          isHidden.current = false;
+          Animated.spring(navTranslateY, {
+            toValue: 0,
+            friction: 8,
+            tension: 50,
+            useNativeDriver: true,
+          }).start();
+        }
+      }
+
+      lastScrollOffset.current = currentOffset;
+    },
+    [navTranslateY]
+  );
+
+  const insets = useSafeAreaInsets();
+  const topInset = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : insets.top;
+
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={[styles.safeArea, { paddingTop: topInset }]}>
       <StatusBar barStyle="dark-content" />
 
       {/* Drawer Navigation */}
@@ -231,7 +297,12 @@ export const ExpenseDashboard: React.FC = () => {
           data={expenses}
           keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.contentContainer}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={[
+            styles.contentContainer,
+            { paddingBottom: moderateScale(95) },
+          ]}
           ListHeaderComponent={
             <>
               {/* Header with Top-Left Drawer Button & Clickable Logo */}
@@ -245,15 +316,6 @@ export const ExpenseDashboard: React.FC = () => {
                 }
                 onProfilePress={() => dispatch(setActiveTab('profile'))}
               />
-
-              {/* Offline Notice Banner */}
-              {isOffline && (
-                <OfflineBanner
-                  onPress={handleToggleOffline}
-                  title="You are offline"
-                  subtitle="Your data will sync automatically when you're back online. Tap to toggle."
-                />
-              )}
 
               {/* Expense Gradient Summary Card */}
               <SummaryCard
@@ -308,13 +370,15 @@ export const ExpenseDashboard: React.FC = () => {
           ListFooterComponent={<View style={styles.footerSpace} />}
         />
 
-        {/* Reusable Bottom Navigation */}
+        {/* Floating Animated Bottom Navigation */}
         <BottomNavigation
           activeTab="home"
           onTabPress={handleTabPress}
+          translateY={navTranslateY}
+          floating
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -322,7 +386,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.background,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
     flex: 1,
