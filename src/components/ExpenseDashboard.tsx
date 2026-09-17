@@ -34,7 +34,7 @@ import { SCREEN_NAMES } from '../utils/screenNames';
 const QUICK_ACTIONS = [
   {
     id: 'add',
-    title: 'Add\nExpense',
+    title: 'Add Expense',
     icon: Plus,
     isPrimary: true,
   },
@@ -45,12 +45,12 @@ const QUICK_ACTIONS = [
   },
   {
     id: 'analytics',
-    title: 'Analytics\nStats',
+    title: 'Analytics',
     icon: BarChart3,
   },
   {
     id: 'categories',
-    title: 'Browse\nCategories',
+    title: 'Categories',
     icon: Grid2x2,
   },
 ];
@@ -102,7 +102,7 @@ export const ExpenseDashboard: React.FC = () => {
 
   // Compute financial metrics via Redux state
   const totalExpenses = useMemo(() => {
-    return expenses.reduce((sum, item) => sum + item.amount, 0);
+    return expenses.reduce((sum, item) => sum + item.category === 'Credit' ? 0 : item.amount, 0);
   }, [expenses]);
 
   const balance = useMemo(() => {

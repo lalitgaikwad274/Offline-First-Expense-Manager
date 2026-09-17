@@ -62,7 +62,7 @@ export const ExpenseCard = memo(({
 }: ExpenseCardProps) => {
   const expenseData = item || expense;
   if (!expenseData) return null;
-
+  const isCredit = expenseData.category === 'Credit';
   const Icon = getCategoryIcon(expenseData.category);
   const iconColor = expenseData.color || getCategoryColor(expenseData.category);
 
@@ -103,8 +103,8 @@ export const ExpenseCard = memo(({
       </View>
 
       {/* Amount */}
-      <Text style={styles.amount}>
-        - {formatCurrency(expenseData.amount)}
+      <Text style={[styles.amount, isCredit && { color: COLORS.income }]}>
+        {isCredit ? '+' : '-'} {formatCurrency(expenseData.amount)}
       </Text>
     </Pressable>
   );

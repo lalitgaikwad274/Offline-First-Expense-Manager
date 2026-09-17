@@ -8,6 +8,7 @@ export type ExpenseCategory =
   | 'Travel'
   | 'mutual funds'
   | 'Loans'
+  | 'Credit'
   | 'Other';
 
 export interface Expense {

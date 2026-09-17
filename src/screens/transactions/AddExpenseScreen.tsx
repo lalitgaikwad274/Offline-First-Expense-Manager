@@ -21,7 +21,7 @@ import {
   Tag,
 } from 'lucide-react-native';
 import { useAppDispatch } from '../../store';
-import { addExpense } from '../../store/expenseSlice';
+import { addExpense, setIncome } from '../../store/expenseSlice';
 import { COLORS, moderateScale, SHADOWS } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
 import { ExpenseCategory } from '../../types/expense';
@@ -331,8 +331,8 @@ const AddExpenseScreen: React.FC = () => {
 
     const newExpense = {
       id: Date.now().toString(),
-      title: title.trim() || (isCredit ? 'Income' : selectedCategory),
-      category: selectedCategory,
+      title: title.trim() || (isCredit ? 'Credit' : selectedCategory),
+      category: isCredit ? 'Credit' : selectedCategory,
       type: transactionType,
       bankId: selectedBank?.id,
       bankName: selectedBank?.name,
@@ -345,6 +345,7 @@ const AddExpenseScreen: React.FC = () => {
       synced: false, // Default offline first!
     };
 
+    isCredit && dispatch(setIncome(parsedAmount))
     dispatch(addExpense(newExpense));
 
     Alert.alert(

@@ -64,7 +64,7 @@ export const expenseSlice = createSlice({
       state.expenses = action.payload;
     },
     setIncome: (state, action: PayloadAction<number>) => {
-      state.income = action.payload;
+      state.income = state.income + action.payload;
     },
     setOffline: (state, action: PayloadAction<boolean>) => {
       state.isOffline = action.payload;

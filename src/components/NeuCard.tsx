@@ -17,9 +17,6 @@ export const NeuCard = memo(({
 }: NeuCardProps) => {
   return (
     <View style={[styles.card, style]}>
-      {showHighlight && (
-        <View style={[styles.highlight, { backgroundColor: highlightColor }]} />
-      )}
       {children}
     </View>
   );
