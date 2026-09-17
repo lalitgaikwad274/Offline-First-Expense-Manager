@@ -44,18 +44,16 @@ const initialState: ExpenseState = {
   selectedPeriod: 'This Month',
   isOffline: true, // Demo default showing offline capability
   activeTab: 'home',
-  user: {
-    id: 'u1',
-    name: 'Lalit',
-    initials: 'L',
-    notificationCount: 1,
-  },
+  user: {},
 };
 
 export const expenseSlice = createSlice({
   name: 'expense',
   initialState,
   reducers: {
+    setUserDetail: (state, action: PayloadAction<UserProfile> ) => {
+      state.user = action.payload
+    },
     addExpense: (state, action: PayloadAction<Expense>) => {
       state.expenses.unshift(action.payload);
     },
@@ -87,6 +85,7 @@ export const expenseSlice = createSlice({
 });
 
 export const {
+  setUserDetail,
   addExpense,
   deleteExpense,
   setExpenses,

@@ -223,6 +223,7 @@ export const ExpenseDashboard: React.FC = () => {
     },
     [navigation]
   );
+  console.log("user", user)
 
   const navTranslateY = useRef(new Animated.Value(0)).current;
   const lastScrollOffset = useRef(0);

@@ -16,11 +16,14 @@ import { AuthStackParamList } from '../../navigation/AuthNavigator';
 import { getAuth, signInWithEmailAndPassword } from '@react-native-firebase/auth';
 import { COLORS } from '../../utils/colors';
 import { scalePxToDP } from '../../utils/responsive';
+import { useDispatch } from 'react-redux';
+import { setUserDetail } from '../../store/expenseSlice';
 
 type LoginNavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
 const LoginScreen = () => {
     const navigation = useNavigation<LoginNavigationProp>();
+    const dispatch = useDispatch()
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -43,8 +46,14 @@ const LoginScreen = () => {
                 email.trim(),
                 password,
             );
-
-            console.log('Login successful:', userCredential.user);
+            console.log(userCredential)
+            dispatch(setUserDetail({
+                id: userCredential.user.uid,
+                name: userCredential?.user?.displayName?.trim() || "",
+                initials: userCredential?.user?.displayName?.trim()[0]?.toUpperCase() || "",
+                notificationCount: 0,
+            })) 
+            console.log('Login successful:', userCredential);
             Alert.alert('Success', 'Logged in successfully!');
         } catch (error: any) {
             console.error('Login Failed', error);
