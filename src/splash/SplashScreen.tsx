@@ -30,12 +30,18 @@ const SplashScreen = ({onFinish}: SplashScreenProps) => {
         backgroundColor="#F7FBFC"
         translucent
       />
+      <LottieView
+        source={require('../Assets/lottie/expense_manager_splash.json')}
+        style={styles.animation}
+        autoPlay
+        loop={false}
+      />
 
-      <Image
+      {/* <Image
         source={require('../Assets/images/splash.png')}
         style={styles.splashImage}
         resizeMode="cover"
-      />
+      /> */}
     </View>
   );
 };
@@ -96,14 +102,14 @@ const styles = StyleSheet.create({
   },
 
   splashImage: {
-    width: '100%',
-    height: '100%',
+    width: width,
+    height: height,
     resizeMode: 'contain',
   },
 
   animation: {
-    width: 280,
-    height: 280,
+    width: width,
+    height: height,
   },
 
   textContainer: {

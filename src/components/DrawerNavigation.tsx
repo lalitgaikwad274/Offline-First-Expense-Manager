@@ -82,18 +82,13 @@ export const DrawerNavigation = memo(({
 }: DrawerNavigationProps) => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
-
+  console.log("current user", currentUser)
   const displayName = currentUser?.displayName || user?.name || 'User';
   const initials =
     user?.initials ||
     (displayName
-      ? displayName
-          .split(' ')
-          .map(n => n[0])
-          .join('')
-          .toUpperCase()
-          .slice(0, 2)
-      : 'L');
+      ? displayName[0].toUpperCase()
+      : 'U');
 
   const handleLogoutPress = () => {
     onClose();

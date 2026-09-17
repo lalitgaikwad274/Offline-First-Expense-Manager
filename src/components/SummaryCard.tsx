@@ -78,11 +78,8 @@ export const SummaryCard = memo(({
 const styles = StyleSheet.create({
   card: {
     width: '100%',
-    minHeight: moderateScale(155),
     borderRadius: SPACING.cardRadius,
     marginBottom: SPACING.lg,
-    overflow: 'hidden',
-    justifyContent: 'space-between',
     ...SHADOWS.medium,
   },
   cardContainer: {

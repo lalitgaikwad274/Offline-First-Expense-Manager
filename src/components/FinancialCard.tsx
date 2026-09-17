@@ -55,7 +55,6 @@ export const FinancialCard = memo(({
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    minHeight: moderateScale(108),
     borderRadius: SPACING.cardRadius,
     paddingHorizontal: moderateScale(14),
     paddingVertical: moderateScale(12),

@@ -54,33 +54,6 @@ export const Header = memo(({
             <Menu size={moderateScale(22)} color={COLORS.navy} strokeWidth={2.4} />
           </Pressable>
 
-          {/* Clickable Logo with Alert */}
-          {/* <Pressable
-            onPress={handleLogoPress}
-            hitSlop={8}
-            style={({ pressed }) => [
-              styles.logoButton,
-              pressed && styles.pressed,
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel="App Logo"
-          >
-            <LinearGradient
-              colors={COLORS.gradientPrimary}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.logoBadge}
-            >
-              <Wallet size={moderateScale(17)} color={COLORS.white} strokeWidth={2.4} />
-            </LinearGradient>
-            <View>
-              <View style={styles.logoTitleRow}>
-                <Text style={styles.logoText}>Expensio</Text>
-                <Sparkles size={moderateScale(12)} color={COLORS.primary} strokeWidth={2.5} />
-              </View>
-              <Text style={styles.logoSubtitle}>Offline-First</Text>
-            </View>
-          </Pressable> */}
           <View style={styles.greetingRow}>
             <View style={styles.greetingContainer}>
               <Text style={styles.helloText}>Hello,</Text>
@@ -108,36 +81,9 @@ export const Header = memo(({
               {notificationCount > 0 && <View style={styles.notificationDot} />}
             </View>
           </Pressable>
-
-          {/* <Pressable
-            onPress={onProfilePress}
-            hitSlop={8}
-            style={({ pressed }) => [
-              styles.avatarWrapper,
-              pressed && styles.pressed,
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel="User Profile"
-          >
-            <LinearGradient
-              colors={COLORS.gradientAvatar}
-              style={styles.avatarBackground}
-            >
-              <Text style={styles.avatarText}>{userInitials}</Text>
-            </LinearGradient>
-          </Pressable> */}
         </View>
       </View>
 
-      {/* Greeting Row */}
-      {/* <View style={styles.greetingRow}>
-        <View style={styles.greetingContainer}>
-          <Text style={styles.helloText}>Hello,</Text>
-          <Text style={styles.userName}>
-            {userName} <Text style={styles.wave}>👋</Text>
-          </Text>
-        </View>
-      </View> */}
     </View>
   );
 });
@@ -247,7 +193,7 @@ const styles = StyleSheet.create({
     marginTop: moderateScale(6),
   },
   greetingContainer: {
-    flex: 1,
+    // flex: 1,
   },
   helloText: {
     fontSize: moderateScale(10),

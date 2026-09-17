@@ -16,6 +16,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from '@react-native-firebase/auth';
 import { scalePxToDP } from '../../utils/responsive';
+import { useDispatch } from 'react-redux';
+import { setUserDetail } from '../../store/expenseSlice';
 
 
 const COLORS = {
@@ -31,6 +33,8 @@ const COLORS = {
 };
 
 const RegisterScreen = ({ navigation }: any) => {
+  const dispatch = useDispatch()
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,23 +44,6 @@ const RegisterScreen = ({ navigation }: any) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agree, setAgree] = useState(false);
-
-  // const handleRegister = () => {
-  //   if (!name || !email || !password || !confirmPassword) {
-  //     return;
-  //   }
-
-  //   if (password !== confirmPassword) {
-  //     return;
-  //   }
-
-  //   // TODO: Register API / local database logic
-  //   console.log({
-  //     name,
-  //     email,
-  //     password,
-  //   });
-  // };
 
   const handleRegister = async () => {
     if (!name.trim()) {
@@ -91,7 +78,12 @@ const RegisterScreen = ({ navigation }: any) => {
           email.trim(),
           password,
         );
-
+      dispatch(setUserDetail({
+        id: userCredential.user.uid,
+        name: name.trim(),
+        initials: name.trim()[0]?.toUpperCase(),
+        notificationCount: 0,
+      })) 
       if (userCredential.user) {
         await updateProfile(userCredential.user, {
           displayName: name.trim(),
