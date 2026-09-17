@@ -102,7 +102,7 @@ export const ExpenseDashboard: React.FC = () => {
 
   // Compute financial metrics via Redux state
   const totalExpenses = useMemo(() => {
-    return expenses.reduce((sum, item) => sum + item.category === 'Credit' ? 0 : item.amount, 0);
+    return expenses.reduce((sum, item) => sum + (item.category === 'Credit' ? 0 : item.amount), 0);
   }, [expenses]);
 
   const balance = useMemo(() => {
