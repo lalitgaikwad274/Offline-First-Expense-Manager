@@ -27,7 +27,6 @@ import {
 import { useAppSelector } from '../../store';
 import { COLORS, moderateScale, SHADOWS, APP_CONFIG } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
-import BottomNavigation from '../../components/BottomNavigation';
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -224,9 +223,6 @@ const ProfileScreen: React.FC = () => {
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </ScrollView>
-
-      {/* Bottom Navigation with Active Tab */}
-      <BottomNavigation activeTab="profile" />
     </SafeAreaView>
   );
 };
@@ -271,14 +267,18 @@ const styles = StyleSheet.create({
     paddingBottom: moderateScale(100),
   },
   userCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderRadius: moderateScale(20),
     padding: moderateScale(20),
     alignItems: 'center',
     marginBottom: moderateScale(14),
     borderWidth: 1,
-    borderColor: 'rgba(219, 237, 240, 0.8)',
-    ...SHADOWS.soft,
+    borderColor: 'rgba(255, 255, 255, 0.88)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   avatarContainer: {
     width: moderateScale(68),
@@ -288,7 +288,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: moderateScale(12),
-    ...SHADOWS.soft,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
   },
   avatarText: {
     fontSize: moderateScale(28),
@@ -329,13 +333,17 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     flexDirection: 'row',
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderRadius: moderateScale(16),
     paddingVertical: moderateScale(14),
     marginBottom: moderateScale(16),
     borderWidth: 1,
-    borderColor: 'rgba(219, 237, 240, 0.8)',
-    ...SHADOWS.soft,
+    borderColor: 'rgba(255, 255, 255, 0.88)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   statCol: {
     flex: 1,
@@ -344,7 +352,7 @@ const styles = StyleSheet.create({
   statColDivider: {
     width: 1,
     height: '70%',
-    backgroundColor: 'rgba(219, 237, 240, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.06)',
     alignSelf: 'center',
   },
   statCount: {
@@ -371,12 +379,16 @@ const styles = StyleSheet.create({
     marginLeft: moderateScale(4),
   },
   menuGroup: {
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderRadius: moderateScale(16),
     borderWidth: 1,
-    borderColor: 'rgba(219, 237, 240, 0.8)',
+    borderColor: 'rgba(255, 255, 255, 0.88)',
     overflow: 'hidden',
-    ...SHADOWS.soft,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   menuItem: {
     flexDirection: 'row',
@@ -409,22 +421,26 @@ const styles = StyleSheet.create({
   },
   itemDivider: {
     height: 1,
-    backgroundColor: 'rgba(219, 237, 240, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
     marginLeft: moderateScale(60),
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     paddingVertical: moderateScale(14),
     borderRadius: moderateScale(16),
-    borderWidth: 1,
-    borderColor: 'rgba(255, 107, 107, 0.3)',
     gap: moderateScale(8),
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.88)',
     marginTop: moderateScale(4),
     marginBottom: moderateScale(20),
-    ...SHADOWS.soft,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   logoutText: {
     fontSize: moderateScale(14),

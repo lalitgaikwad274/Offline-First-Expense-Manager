@@ -306,7 +306,6 @@ const AddExpenseScreen: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   // Only reset the amount when the user actually changes Debit/Credit.
-  // The TextInput remains a normal controlled React Native input.
   const handleTransactionTypeChange = (type: 'debit' | 'credit') => {
     if (type === transactionType) {
       return;
@@ -317,9 +316,13 @@ const AddExpenseScreen: React.FC = () => {
   };
 
   const handleAmountChange = (value: string) => {
-    // Do not modify the text while the user is typing.
-    // This is important for iOS TextInput cursor/selection handling.
-    setAmount(value);
+    // Only allow numbers and at most one decimal point
+    const sanitized = value.replace(/[^0-9.]/g, '');
+    const dots = (sanitized.match(/\./g) || []).length;
+    if (dots > 1) {
+      return;
+    }
+    setAmount(sanitized);
   };
 
   const handleSave = () => {
@@ -449,13 +452,9 @@ const AddExpenseScreen: React.FC = () => {
                   placeholder="0.00"
                   placeholderTextColor="rgba(17, 34, 47, 0.25)"
                   keyboardType="decimal-pad"
-                  editable
-                  autoFocus={false}
                   autoCorrect={false}
                   autoCapitalize="none"
-                  textAlign="center"
-                  caretHidden={false}
-                  underlineColorAndroid="transparent"
+                  returnKeyType="done"
                 />
               </View>
             </View>
@@ -656,23 +655,31 @@ const styles = StyleSheet.create({
   bankSection: {
     position: 'relative',
     zIndex: 20,
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderRadius: moderateScale(20),
     padding: moderateScale(18),
     marginBottom: moderateScale(16),
     borderWidth: 1,
-    borderColor: 'rgba(219, 237, 240, 0.8)',
-    ...SHADOWS.soft,
+    borderColor: 'rgba(255, 255, 255, 0.88)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   amountCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderRadius: moderateScale(20),
     padding: moderateScale(20),
     alignItems: 'center',
     marginBottom: moderateScale(16),
     borderWidth: 1,
-    borderColor: 'rgba(219, 237, 240, 0.8)',
-    ...SHADOWS.soft,
+    borderColor: 'rgba(255, 255, 255, 0.88)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   amountLabel: {
     fontSize: moderateScale(11),
@@ -682,7 +689,6 @@ const styles = StyleSheet.create({
     marginBottom: moderateScale(8),
   },
   amountInputRow: {
-    width: '100%',
     minHeight: moderateScale(68),
     flexDirection: 'row',
     alignItems: 'center',
@@ -693,36 +699,46 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: COLORS.petrol,
     marginRight: moderateScale(6),
-    includeFontPadding: false,
   },
   amountField: {
-    width: moderateScale(180),
+    minWidth: moderateScale(100),
+    maxWidth: moderateScale(260),
     height: moderateScale(54),
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   amountInput: {
     width: '100%',
-    height: moderateScale(54),
+    height: '100%',
     fontSize: moderateScale(36),
-    fontWeight: '800',
+    fontWeight: '900',
     color: COLORS.navy,
+    textAlign: 'center',
     padding: 0,
     margin: 0,
+    includeFontPadding: false,
+  },
+  amountPlaceholder: {
+    fontSize: moderateScale(36),
+    fontWeight: '900',
+    color: COLORS.navy,
     textAlign: 'center',
-    textAlignVertical: 'center',
     includeFontPadding: false,
   },
   formSection: {
     position: 'relative',
     zIndex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderRadius: moderateScale(20),
     padding: moderateScale(18),
     marginBottom: moderateScale(18),
     borderWidth: 1,
-    borderColor: 'rgba(219, 237, 240, 0.8)',
-    ...SHADOWS.soft,
+    borderColor: 'rgba(255, 255, 255, 0.88)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   inputGroup: {
     marginBottom: moderateScale(16),

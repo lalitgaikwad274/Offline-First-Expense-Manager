@@ -9,6 +9,7 @@ export interface ExpenseCardProps {
   item?: Expense;
   expense?: Expense;
   isLast?: boolean;
+  variant?: 'standalone' | 'row';
   onPress?: (expense: Expense) => void;
   onLongPress?: (expense: Expense) => void;
 }
@@ -57,6 +58,7 @@ export const ExpenseCard = memo(({
   item,
   expense,
   isLast = false,
+  variant = 'row',
   onPress,
   onLongPress,
 }: ExpenseCardProps) => {
@@ -65,14 +67,15 @@ export const ExpenseCard = memo(({
   const isCredit = expenseData.category === 'Credit';
   const Icon = getCategoryIcon(expenseData.category);
   const iconColor = expenseData.color || getCategoryColor(expenseData.category);
+  const isRow = variant === 'row';
 
   return (
     <Pressable
       onPress={() => onPress?.(expenseData)}
       onLongPress={() => onLongPress?.(expenseData)}
       style={({ pressed }) => [
-        styles.container,
-        !isLast && styles.borderBottom,
+        isRow ? styles.rowContainer : styles.standaloneContainer,
+        isRow && !isLast && styles.borderBottom,
         pressed && styles.pressed,
       ]}
       accessibilityRole="button"
@@ -81,7 +84,7 @@ export const ExpenseCard = memo(({
       {/* Category Icon */}
       <View style={[styles.iconWrapper, { backgroundColor: iconColor }]}>
         <Icon
-          size={moderateScale(24)}
+          size={moderateScale(22)}
           color={COLORS.white}
           strokeWidth={2.2}
         />
@@ -111,24 +114,46 @@ export const ExpenseCard = memo(({
 });
 
 const styles = StyleSheet.create({
-  container: {
-    minHeight: moderateScale(84),
-    backgroundColor: COLORS.surfaceCard,
+  rowContainer: {
+    minHeight: moderateScale(70),
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: moderateScale(12),
-    paddingVertical: moderateScale(10),
+    paddingHorizontal: moderateScale(14),
+    paddingVertical: moderateScale(11),
+  },
+  standaloneContainer: {
+    minHeight: moderateScale(76),
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: moderateScale(14),
+    paddingVertical: moderateScale(12),
+    borderRadius: moderateScale(18),
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.95)',
+    marginBottom: moderateScale(10),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   borderBottom: {
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider,
+    borderBottomWidth: StyleSheet.hairlineWidth * 1.5,
+    borderBottomColor: 'rgba(0, 0, 0, 0.07)',
   },
   iconWrapper: {
-    width: moderateScale(48),
-    height: moderateScale(48),
-    borderRadius: moderateScale(24),
+    width: moderateScale(44),
+    height: moderateScale(44),
+    borderRadius: moderateScale(22),
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   details: {
     flex: 1,
@@ -142,7 +167,7 @@ const styles = StyleSheet.create({
   },
   category: {
     color: COLORS.navy,
-    fontSize: moderateScale(16),
+    fontSize: moderateScale(15),
     fontWeight: '800',
     marginBottom: moderateScale(2),
   },
@@ -160,13 +185,13 @@ const styles = StyleSheet.create({
   },
   amount: {
     color: COLORS.expense,
-    fontSize: moderateScale(16),
+    fontSize: moderateScale(15.5),
     fontWeight: '800',
     marginLeft: moderateScale(8),
   },
   pressed: {
-    opacity: 0.75,
-    backgroundColor: 'rgba(235, 252, 253, 0.95)',
+    opacity: 0.7,
+    backgroundColor: 'rgba(255, 255, 255, 0.35)',
   },
 });
 

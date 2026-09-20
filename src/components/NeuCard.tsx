@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { StyleSheet, View, ViewStyle, StyleProp } from 'react-native';
-import { COLORS, SHADOWS, SPACING } from '../utils/constants';
+import { moderateScale } from '../utils/constants';
 
 export interface NeuCardProps {
   children: React.ReactNode;
@@ -12,8 +12,6 @@ export interface NeuCardProps {
 export const NeuCard = memo(({
   children,
   style,
-  highlightColor = 'rgba(255, 255, 255, 0.95)',
-  showHighlight = true,
 }: NeuCardProps) => {
   return (
     <View style={[styles.card, style]}>
@@ -24,17 +22,16 @@ export const NeuCard = memo(({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.surface,
-    borderRadius: SPACING.cardRadius,
-    ...SHADOWS.soft,
-  },
-  highlight: {
-    position: 'absolute',
-    top: 1,
-    left: 10,
-    right: 10,
-    height: 2,
-    borderRadius: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    borderRadius: moderateScale(18),
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.95)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 3,
+    overflow: 'hidden',
   },
 });
 

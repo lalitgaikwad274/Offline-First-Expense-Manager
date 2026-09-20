@@ -23,7 +23,6 @@ import {
 import { useAppSelector } from '../../store';
 import { COLORS, moderateScale, SHADOWS } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
-import BottomNavigation from '../../components/BottomNavigation';
 import { ExpenseCategory } from '../../types/expense';
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -236,9 +235,6 @@ const AnalyticsScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
-
-      {/* Bottom Navigation with Active Tab */}
-      <BottomNavigation activeTab="analytics" />
     </SafeAreaView>
   );
 };
@@ -300,13 +296,17 @@ const styles = StyleSheet.create({
     paddingBottom: moderateScale(100),
   },
   heroCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderRadius: moderateScale(20),
     padding: moderateScale(18),
     borderWidth: 1,
-    borderColor: 'rgba(219, 237, 240, 0.8)',
+    borderColor: 'rgba(255, 255, 255, 0.88)',
     marginBottom: moderateScale(14),
-    ...SHADOWS.soft,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   heroHeader: {
     flexDirection: 'row',
@@ -400,13 +400,17 @@ const styles = StyleSheet.create({
     color: COLORS.navy,
   },
   syncCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderRadius: moderateScale(16),
     padding: moderateScale(16),
     borderWidth: 1,
-    borderColor: 'rgba(219, 237, 240, 0.8)',
+    borderColor: 'rgba(255, 255, 255, 0.88)',
     marginBottom: moderateScale(14),
-    ...SHADOWS.soft,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   syncHeader: {
     flexDirection: 'row',
@@ -444,9 +448,11 @@ const styles = StyleSheet.create({
     marginBottom: moderateScale(10),
   },
   emptyCategories: {
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     padding: moderateScale(24),
     borderRadius: moderateScale(16),
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.88)',
     alignItems: 'center',
   },
   emptyText: {
@@ -454,13 +460,17 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
   },
   categoryCard: {
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderRadius: moderateScale(14),
     padding: moderateScale(14),
     marginBottom: moderateScale(10),
     borderWidth: 1,
-    borderColor: 'rgba(219, 237, 240, 0.8)',
-    ...SHADOWS.soft,
+    borderColor: 'rgba(255, 255, 255, 0.88)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   categoryRow: {
     flexDirection: 'row',

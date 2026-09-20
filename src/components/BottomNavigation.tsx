@@ -26,11 +26,11 @@ export interface BottomNavigationProps {
 }
 
 const NAV_CONSTANTS = {
-  barContentHeight: moderateScale(58),
-  fabHaloSize: moderateScale(58),
-  fabInnerSize: moderateScale(48),
-  iconSize: moderateScale(22),
-  avatarSize: moderateScale(26),
+  barContentHeight: moderateScale(60),
+  fabHaloSize: moderateScale(60),
+  fabInnerSize: moderateScale(50),
+  iconSize: moderateScale(23),
+  avatarSize: moderateScale(28),
 } as const;
 
 export const BottomNavigation = memo(({
@@ -50,7 +50,6 @@ export const BottomNavigation = memo(({
   }
 
   const reduxUser = useAppSelector(state => state.expense?.user);
-  const userInitials = reduxUser?.initials || 'L';
 
   const handleTabPress = useCallback((tabId: TabId) => {
     if (onTabPress) {
@@ -117,8 +116,8 @@ export const BottomNavigation = memo(({
         >
           <Home
             size={NAV_CONSTANTS.iconSize}
-            color={isHomeActive ? COLORS.navActive : COLORS.navInactive}
-            strokeWidth={isHomeActive ? 2.5 : 1.9}
+            color={isHomeActive ? COLORS.navActive : '#4A5D78'}
+            strokeWidth={isHomeActive ? 2.6 : 2.1}
           />
           {isHomeActive && <View style={styles.activeDot} />}
         </Pressable>
@@ -134,8 +133,8 @@ export const BottomNavigation = memo(({
         >
           <Receipt
             size={NAV_CONSTANTS.iconSize}
-            color={isTransactionsActive ? COLORS.navActive : COLORS.navInactive}
-            strokeWidth={isTransactionsActive ? 2.5 : 1.9}
+            color={isTransactionsActive ? COLORS.navActive : '#4A5D78'}
+            strokeWidth={isTransactionsActive ? 2.6 : 2.1}
           />
           {isTransactionsActive && <View style={styles.activeDot} />}
         </Pressable>
@@ -153,9 +152,9 @@ export const BottomNavigation = memo(({
           >
             <View style={styles.fabButton}>
               <Plus
-                size={moderateScale(24)}
+                size={moderateScale(26)}
                 color={COLORS.white}
-                strokeWidth={2.8}
+                strokeWidth={3}
               />
             </View>
           </Pressable>
@@ -172,8 +171,8 @@ export const BottomNavigation = memo(({
         >
           <BarChart3
             size={NAV_CONSTANTS.iconSize}
-            color={isAnalyticsActive ? COLORS.navActive : COLORS.navInactive}
-            strokeWidth={isAnalyticsActive ? 2.5 : 1.9}
+            color={isAnalyticsActive ? COLORS.navActive : '#4A5D78'}
+            strokeWidth={isAnalyticsActive ? 2.6 : 2.1}
           />
           {isAnalyticsActive && <View style={styles.activeDot} />}
         </Pressable>
@@ -194,8 +193,8 @@ export const BottomNavigation = memo(({
           ) : (
             <User
               size={NAV_CONSTANTS.iconSize}
-              color={isProfileActive ? COLORS.navActive : COLORS.navInactive}
-              strokeWidth={isProfileActive ? 2.5 : 1.9}
+              color={isProfileActive ? COLORS.navActive : '#4A5D78'}
+              strokeWidth={isProfileActive ? 2.6 : 2.1}
             />
           )}
           {isProfileActive && <View style={styles.activeDot} />}
@@ -212,29 +211,29 @@ const styles = StyleSheet.create({
     right: moderateScale(16),
     zIndex: 99,
     shadowColor: '#05142B',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 20,
-    elevation: 14,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 22,
+    elevation: 16,
   },
   fullWidthWrapper: {
     width: '100%',
   },
   floatingContainer: {
     height: NAV_CONSTANTS.barContentHeight,
-    backgroundColor: COLORS.white,
+    backgroundColor: 'rgba(255, 255, 255, 0.94)',
     borderRadius: moderateScale(30),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: moderateScale(12),
-    borderWidth: 1,
-    borderColor: 'rgba(215, 230, 245, 0.95)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 1)',
     shadowColor: '#05142B',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.16,
     shadowRadius: 22,
-    elevation: 14,
+    elevation: 16,
   },
   fullWidthContainer: {
     height: NAV_CONSTANTS.barContentHeight,
@@ -259,9 +258,9 @@ const styles = StyleSheet.create({
   activeDot: {
     position: 'absolute',
     bottom: moderateScale(6),
-    width: moderateScale(4),
-    height: moderateScale(4),
-    borderRadius: moderateScale(2),
+    width: moderateScale(5),
+    height: moderateScale(5),
+    borderRadius: moderateScale(2.5),
     backgroundColor: COLORS.navActive,
   },
   fabSlot: {
@@ -280,13 +279,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.navFabHalo,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 3.5,
+    borderWidth: 4,
     borderColor: COLORS.white,
     shadowColor: '#05142B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 10,
   },
   fabPressed: {
     transform: [{ scale: 0.94 }],
@@ -311,7 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: NAV_CONSTANTS.avatarSize / 2,
     overflow: 'hidden',
     borderWidth: 1.5,
-    borderColor: COLORS.navInactive,
+    borderColor: '#4A5D78',
     alignItems: 'center',
     justifyContent: 'center',
   },

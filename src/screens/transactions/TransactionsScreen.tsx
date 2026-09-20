@@ -29,7 +29,6 @@ import {
 } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
 import ExpenseCard from '../../components/ExpenseCard';
-import BottomNavigation from '../../components/BottomNavigation';
 
 const FILTER_OPTIONS = ['All', 'Synced', 'Pending'] as const;
 
@@ -972,40 +971,38 @@ const TransactionsScreen: React.FC = () => {
 
                 {/* TRANSACTIONS */}
 
-                {item.data.map(
-                  expense => (
-                    <ExpenseCard
-                      key={
-                        expense.id
-                      }
-                      expense={
-                        expense
-                      }
-                      onPress={() => {
-                        navigation.navigate(
-                          SCREEN_NAMES.EXPENSE_DETAILS,
-                          {
-                            expenseId:
-                              expense.id,
-                          },
-                        );
-                      }}
-                    />
-                  ),
-                )}
+                <View style={styles.groupCard}>
+                  {item.data.map(
+                    (expense, idx) => (
+                      <ExpenseCard
+                        key={
+                          expense.id
+                        }
+                        expense={
+                          expense
+                        }
+                        variant="row"
+                        isLast={
+                          idx === item.data.length - 1
+                        }
+                        onPress={() => {
+                          navigation.navigate(
+                            SCREEN_NAMES.EXPENSE_DETAILS,
+                            {
+                              expenseId:
+                                expense.id,
+                            },
+                          );
+                        }}
+                      />
+                    ),
+                  )}
+                </View>
               </View>
             )}
           />
         )}
       </View>
-
-      {/* =================================================
-          BOTTOM NAV
-      ================================================= */}
-
-      <BottomNavigation
-        activeTab="transactions"
-      />
 
       {/* =================================================
           DATE FILTER MODAL
@@ -1470,6 +1467,20 @@ const styles = StyleSheet.create({
     marginBottom:
       moderateScale(9),
     gap: moderateScale(8),
+  },
+
+  groupCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    borderRadius: moderateScale(18),
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.95)',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: moderateScale(14),
   },
 
   dateHeaderLine: {

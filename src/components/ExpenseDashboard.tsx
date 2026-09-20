@@ -276,6 +276,11 @@ export const ExpenseDashboard: React.FC = () => {
   const insets = useSafeAreaInsets();
   const topInset = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : insets.top;
 
+  // Limit recent expenses to last 5
+  const recentExpenses = useMemo(() => {
+    return expenses.slice(0, 5);
+  }, [expenses]);
+
   return (
     <View style={[styles.safeArea, { paddingTop: topInset }]}>
       <StatusBar barStyle="dark-content" />
@@ -295,14 +300,15 @@ export const ExpenseDashboard: React.FC = () => {
 
       <View style={styles.container}>
         <FlatList
-          data={expenses}
-          keyExtractor={item => item.id}
+          data={[]}
+          renderItem={() => null}
+          keyExtractor={() => 'dashboard-content'}
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
           scrollEventThrottle={16}
           contentContainerStyle={[
             styles.contentContainer,
-            { paddingBottom: moderateScale(95) },
+            { paddingBottom: moderateScale(100) },
           ]}
           ListHeaderComponent={
             <>
@@ -321,16 +327,12 @@ export const ExpenseDashboard: React.FC = () => {
               {/* Expense Gradient Summary Card */}
               <SummaryCard
                 totalAmount={totalExpenses}
+                incomeAmount={income}
+                balanceAmount={balance}
                 selectedPeriod={selectedPeriod}
                 trendPercentage={12}
                 onPeriodPress={handlePeriodChange}
               />
-
-              {/* Financial Metrics (Income & Balance) */}
-              <View style={styles.financialRow}>
-                <FinancialCard type="income" amount={income} />
-                <FinancialCard type="balance" amount={balance} />
-              </View>
 
               {/* Quick Actions Grid */}
               <View style={styles.section}>
@@ -349,26 +351,45 @@ export const ExpenseDashboard: React.FC = () => {
                 </View>
               </View>
 
-              {/* Recent Transactions List Header */}
-              <View style={styles.recentHeader}>
-                <Text style={styles.sectionTitle}>Recent Expenses</Text>
-                <Pressable
-                  hitSlop={8}
-                  onPress={() => navigation.navigate(SCREEN_NAMES.TRANSACTIONS)}
-                >
-                  <Text style={styles.seeAll}>See All</Text>
-                </Pressable>
+              {/* Recent Transactions Unified Card Section */}
+              <View style={styles.recentSection}>
+                <View style={styles.recentHeader}>
+                  <Text style={styles.sectionTitle}>Recent Expenses</Text>
+                  <Pressable
+                    hitSlop={8}
+                    onPress={() => navigation.navigate(SCREEN_NAMES.TRANSACTIONS)}
+                  >
+                    <Text style={styles.seeAll}>See All</Text>
+                  </Pressable>
+                </View>
+
+                <View style={styles.recentUnifiedCard}>
+                  {recentExpenses.length === 0 ? (
+                    <View style={styles.emptyRecent}>
+                      <Receipt
+                        size={moderateScale(32)}
+                        color={COLORS.gray}
+                        strokeWidth={1.8}
+                      />
+                      <Text style={styles.emptyRecentText}>
+                        No recent transactions recorded
+                      </Text>
+                    </View>
+                  ) : (
+                    recentExpenses.map((item, index) => (
+                      <ExpenseCard
+                        key={item.id}
+                        item={item}
+                        variant="row"
+                        isLast={index === recentExpenses.length - 1}
+                        onPress={handleExpensePress}
+                      />
+                    ))
+                  )}
+                </View>
               </View>
             </>
           }
-          renderItem={({ item, index }) => (
-            <ExpenseCard
-              item={item}
-              isLast={index === expenses.length - 1}
-              onPress={handleExpensePress}
-            />
-          )}
-          ListFooterComponent={<View style={styles.footerSpace} />}
         />
 
         {/* Floating Animated Bottom Navigation */}
@@ -396,13 +417,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.screenPaddingHorizontal,
     paddingTop: SPACING.screenPaddingVertical,
   },
-  financialRow: {
-    flexDirection: 'row',
-    gap: SPACING.gapMedium,
-    marginBottom: SPACING.lg,
-  },
   section: {
-    marginBottom: SPACING.xl,
+    marginBottom: SPACING.lg,
   },
   sectionTitle: {
     ...TYPOGRAPHY.h2,
@@ -413,6 +429,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginTop: moderateScale(14),
+  },
+  recentSection: {
+    marginBottom: SPACING.xl,
   },
   recentHeader: {
     flexDirection: 'row',
@@ -425,8 +444,28 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(15),
     fontWeight: '800',
   },
-  footerSpace: {
-    height: moderateScale(30),
+  recentUnifiedCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    borderRadius: moderateScale(18),
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.95)',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  emptyRecent: {
+    paddingVertical: moderateScale(32),
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: moderateScale(8),
+  },
+  emptyRecentText: {
+    fontSize: moderateScale(13),
+    color: COLORS.gray,
+    fontWeight: '600',
   },
 });
 

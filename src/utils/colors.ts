@@ -20,9 +20,11 @@ export const COLORS = {
   info: '#1478E8',
 
   // Backgrounds & Surfaces
-  background: '#EAFBFC',
-  surface: '#F4FFFF',
-  surfaceCard: 'rgba(250, 255, 255, 0.92)',
+  background: '#DAEEF5',
+  surface: 'rgba(255, 255, 255, 0.72)',
+  surfaceCard: 'rgba(255, 255, 255, 0.72)',
+  surfaceGlass: 'rgba(255, 255, 255, 0.72)',
+  surfaceGlassBorder: 'rgba(255, 255, 255, 0.95)',
   surfaceHighlight: 'rgba(255, 255, 255, 0.95)',
   white: '#FFFFFF',
   black: '#000000',
