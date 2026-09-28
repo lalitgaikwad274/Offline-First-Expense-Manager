@@ -184,42 +184,6 @@ export const ExpenseDashboard: React.FC = () => {
     [dispatch, navigation]
   );
 
-  const handleDrawerSelect = useCallback(
-    (itemId: string) => {
-      switch (itemId) {
-        case 'home':
-          dispatch(setActiveTab('home'));
-          break;
-        case 'transactions':
-          navigation.navigate(SCREEN_NAMES.TRANSACTIONS);
-          break;
-        case 'analytics':
-          navigation.navigate(SCREEN_NAMES.ANALYTICS);
-          break;
-        case 'settings':
-          navigation.navigate(SCREEN_NAMES.PROFILE);
-          break;
-        case 'cards':
-          navigation.navigate(SCREEN_NAMES.TRANSACTIONS);
-          break;
-        case 'database':
-          Alert.alert(
-            'Offline SQLite Database',
-            `Active Records: ${expenses.length}\nSync Engine: Active\nPending Syncs: ${expenses.filter(e => !e.synced).length
-            }`
-          );
-          break;
-        case 'security':
-          Alert.alert('Security & Backup', 'AES-256 local encryption enabled.');
-          break;
-        default:
-          dispatch(setActiveTab(itemId));
-          break;
-      }
-    },
-    [dispatch, navigation, expenses]
-  );
-
   const handleExpensePress = useCallback(
     (item: Expense) => {
       navigation.navigate(SCREEN_NAMES.EXPENSE_DETAILS, {
@@ -290,18 +254,6 @@ export const ExpenseDashboard: React.FC = () => {
     <View style={[styles.safeArea, { paddingTop: topInset }]}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Drawer Navigation */}
-      <DrawerNavigation
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        activeItem={activeTab}
-        onSelectItem={handleDrawerSelect}
-        user={user}
-        isOffline={isOffline}
-        onToggleOffline={handleToggleOffline}
-        totalExpensesCount={expenses.length}
-        onLogout={handleLogoutRequest}
-      />
 
       <View style={styles.container}>
         <FlatList
