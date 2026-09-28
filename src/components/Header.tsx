@@ -15,10 +15,9 @@ export interface HeaderProps {
 }
 
 export const Header = memo(({
-  userName = 'Lalit',
-  userInitials = 'L',
-  notificationCount = 1,
-  onOpenDrawer,
+  userName = 'Hello',
+  userInitials = 'H',
+  notificationCount = 0,
   onNotificationPress,
   onProfilePress,
   onLogoPress,
@@ -42,16 +41,10 @@ export const Header = memo(({
         <View style={styles.topLeftGroup}>
           {/* Drawer Menu Button */}
           <Pressable
-            onPress={onOpenDrawer}
             hitSlop={8}
-            style={({ pressed }) => [
-              styles.drawerButton,
-              pressed && styles.pressed,
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel="Open Navigation Drawer"
+            style={styles.logoButton}
           >
-            <Menu size={moderateScale(22)} color={COLORS.navy} strokeWidth={2.4} />
+            <Text style={styles.logoText}>{userInitials}</Text>
           </Pressable>
 
           <View style={styles.greetingRow}>
@@ -113,14 +106,13 @@ const styles = StyleSheet.create({
     ...SHADOWS.soft,
   },
   logoButton: {
+    width: moderateScale(40),
+    height: moderateScale(40),
     flexDirection: 'row',
     alignItems: 'center',
-    gap: moderateScale(8),
-    backgroundColor: COLORS.surface,
-    paddingVertical: moderateScale(5),
-    paddingHorizontal: moderateScale(9),
+    justifyContent: 'center',
     borderRadius: moderateScale(14),
-    ...SHADOWS.soft,
+    backgroundColor: COLORS.primary,
   },
   logoBadge: {
     width: moderateScale(28),
@@ -135,10 +127,9 @@ const styles = StyleSheet.create({
     gap: moderateScale(3),
   },
   logoText: {
-    fontSize: moderateScale(13),
+    fontSize: moderateScale(18),
     fontWeight: '800',
-    color: COLORS.navy,
-    letterSpacing: -0.3,
+    color: COLORS.surface,
   },
   logoSubtitle: {
     fontSize: moderateScale(8.5),
