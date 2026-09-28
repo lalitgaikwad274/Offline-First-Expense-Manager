@@ -148,7 +148,7 @@ export const getCategoryColor = (category: string): string => {
  * }
  */
 export const formatTransaction = (item: any, fallbackId?: string): Expense => {
-  const category = (item.category || item.type || 'Other') as ExpenseCategory;
+  const category = (item.category || item?.description || item.type || 'Other') as ExpenseCategory;
   const color = item.color || getCategoryColor(category);
   const amount = typeof item.amount === 'number' ? item.amount : parseFloat(item.amount) || 0;
   const date = formatTransactionDate(item.date || item.createdAt || item.timestamp);

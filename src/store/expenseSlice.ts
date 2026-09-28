@@ -11,32 +11,7 @@ export interface ExpenseState {
   user: UserProfile;
 }
 
-const initialExpenses: Expense[] = [
-  {
-    id: '1',
-    category: 'Food & Dining',
-    amount: 320,
-    date: 'Today, 10:30 AM',
-    color: COLORS.expense,
-    synced: true,
-  },
-  {
-    id: '2',
-    category: 'Transport',
-    amount: 150,
-    date: 'Yesterday, 09:15 AM',
-    color: COLORS.info,
-    synced: true,
-  },
-  {
-    id: '3',
-    category: 'Shopping',
-    amount: 1200,
-    date: '12 Sep, 04:45 PM',
-    color: COLORS.warning,
-    synced: false,
-  },
-];
+const initialExpenses: Expense[] = [];
 
 const initialState: ExpenseState = {
   expenses: initialExpenses,
