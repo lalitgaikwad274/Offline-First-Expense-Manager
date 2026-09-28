@@ -26,6 +26,9 @@ import { COLORS, moderateScale, SHADOWS } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
 import { ExpenseCategory } from '../../types/expense';
 import BankDropdown, { Bank } from '../../components/BankDropdown';
+import { ENDPOINTS } from '../../utils/ApiConstants';
+import { serverCall } from '../../services/api';
+import { formatTransactionDate } from '../../utils/helpers';
 
 const CATEGORIES: { label: ExpenseCategory; color: string }[] = [
   { label: 'Food & Dining', color: '#FF6B6B' },
@@ -325,7 +328,7 @@ const AddExpenseScreen: React.FC = () => {
     setAmount(sanitized);
   };
 
-  const handleSave = () => {
+  const handleSave = async() => {
     const parsedAmount = parseFloat(amount.trim());
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       Alert.alert('Invalid Amount', 'Please enter a valid amount.');
@@ -334,21 +337,30 @@ const AddExpenseScreen: React.FC = () => {
 
     const newExpense = {
       id: Date.now().toString(),
-      title: title.trim() || (isCredit ? 'Credit' : selectedCategory),
       category: isCredit ? 'Credit' : selectedCategory,
-      type: transactionType,
-      bankId: selectedBank?.id,
-      bankName: selectedBank?.name,
       amount: parsedAmount,
-      date: 'Today, Just now',
-      notes: notes.trim() || undefined,
+      date: formatTransactionDate(new Date()),
       color: isCredit
         ? COLORS.petrol
         : CATEGORIES.find(c => c.label === selectedCategory)?.color || COLORS.expense,
       synced: false, // Default offline first!
+      title: title.trim() || (isCredit ? 'Credit' : selectedCategory),
+      type: transactionType,
+      bankId: selectedBank?.id,
+      bankName: selectedBank?.name,
+      notes: notes.trim() || undefined,
     };
 
-    isCredit && dispatch(setIncome(parsedAmount))
+    try {
+      const result = await serverCall(ENDPOINTS.ADD_TRANSACTION, "POST", {}, newExpense);
+      console.log("@21: Add Expense : ", result);
+      newExpense.synced = true;
+    } catch (apiError) {
+      console.log("Failed to sync transaction to server, saved locally:", apiError);
+      newExpense.synced = false;
+    }
+
+    isCredit && dispatch(setIncome(parsedAmount));
     dispatch(addExpense(newExpense));
 
     Alert.alert(

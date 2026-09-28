@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
@@ -30,6 +30,7 @@ import BottomNavigation from './BottomNavigation';
 import { getAuth, signOut } from '@react-native-firebase/auth';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SCREEN_NAMES } from '../utils/screenNames';
+import { getTransactions } from '../store/api';
 
 const QUICK_ACTIONS = [
   {
@@ -74,6 +75,10 @@ export const ExpenseDashboard: React.FC = () => {
       dispatch(setActiveTab('home'));
     }, [dispatch])
   );
+
+  useEffect(() => {
+    dispatch(getTransactions());
+  }, [dispatch]);
 
   const handleLogoutRequest = useCallback(() => {
     setIsDrawerOpen(false);

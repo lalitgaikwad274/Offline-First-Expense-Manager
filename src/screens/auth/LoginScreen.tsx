@@ -18,6 +18,8 @@ import { COLORS } from '../../utils/colors';
 import { scalePxToDP } from '../../utils/responsive';
 import { useDispatch } from 'react-redux';
 import { setUserDetail } from '../../store/expenseSlice';
+import { ENDPOINTS } from '../../utils/ApiConstants';
+import {serverCall } from '../../services/api'
 
 type LoginNavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
@@ -40,20 +42,17 @@ const LoginScreen = () => {
         }
         try {
             setLoading(true);
-            const auth = getAuth();
-            const userCredential = await signInWithEmailAndPassword(
-                auth,
-                email.trim(),
-                password,
-            );
-            console.log(userCredential)
-            dispatch(setUserDetail({
-                id: userCredential.user.uid,
-                name: userCredential?.user?.displayName?.trim() || "",
-                initials: userCredential?.user?.displayName?.trim()[0]?.toUpperCase() || "",
-                notificationCount: 0,
-            })) 
-            console.log('Login successful:', userCredential);
+            const result = await serverCall(ENDPOINTS.LOGIN, "POST")
+            console.log('Server response result:', result);
+            if( result.status === "success" && result?.user) {
+                dispatch(setUserDetail({
+                    id: result.user.uid,
+                    name: result.user?.displayName?.trim() || "",
+                    initials: result.user?.displayName?.trim()[0]?.toUpperCase() || "",
+                    notificationCount: 0,
+                })) 
+            }
+
             Alert.alert('Success', 'Logged in successfully!');
         } catch (error: any) {
             console.error('Login Failed', error);
