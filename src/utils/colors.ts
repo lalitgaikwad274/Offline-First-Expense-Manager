@@ -21,9 +21,9 @@ export const COLORS = {
 
   // Backgrounds & Surfaces
   background: '#DAEEF5',
-  surface: 'rgba(255, 255, 255, 0.72)',
-  surfaceCard: 'rgba(255, 255, 255, 0.72)',
-  surfaceGlass: 'rgba(255, 255, 255, 0.72)',
+  surface: 'rgba(255, 255, 255, 0.95)',
+  surfaceCard: 'rgba(255, 255, 255, 0.95)',
+  surfaceGlass: 'rgba(255, 255, 255, 0.95)',
   surfaceGlassBorder: 'rgba(255, 255, 255, 0.95)',
   surfaceHighlight: 'rgba(255, 255, 255, 0.95)',
   white: '#FFFFFF',

@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   recentUnifiedCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(18),
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.95)',

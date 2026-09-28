@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   },
   standaloneContainer: {
     minHeight: moderateScale(76),
-    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: moderateScale(14),
