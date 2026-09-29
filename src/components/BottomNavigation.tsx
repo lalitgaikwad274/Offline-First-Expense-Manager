@@ -5,6 +5,7 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  Text,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -119,6 +120,9 @@ export const BottomNavigation = memo(({
             color={isHomeActive ? COLORS.navActive : '#4A5D78'}
             strokeWidth={isHomeActive ? 2.6 : 2.1}
           />
+          <Text style={{ 
+            fontSize: moderateScale(10),
+            color: isHomeActive ? COLORS.navActive : '#4A5D78' }}>Home</Text>
           {isHomeActive && <View style={styles.activeDot} />}
         </Pressable>
 
@@ -136,6 +140,9 @@ export const BottomNavigation = memo(({
             color={isTransactionsActive ? COLORS.navActive : '#4A5D78'}
             strokeWidth={isTransactionsActive ? 2.6 : 2.1}
           />
+          <Text style={{ 
+            fontSize: moderateScale(10),
+            color: isTransactionsActive ? COLORS.navActive : '#4A5D78' }}>Transactions</Text>
           {isTransactionsActive && <View style={styles.activeDot} />}
         </Pressable>
 
@@ -174,6 +181,9 @@ export const BottomNavigation = memo(({
             color={isAnalyticsActive ? COLORS.navActive : '#4A5D78'}
             strokeWidth={isAnalyticsActive ? 2.6 : 2.1}
           />
+           <Text style={{ 
+            fontSize: moderateScale(10),
+            color: isAnalyticsActive ? COLORS.navActive : '#4A5D78' }}>Analytics</Text>
           {isAnalyticsActive && <View style={styles.activeDot} />}
         </Pressable>
 
@@ -197,6 +207,9 @@ export const BottomNavigation = memo(({
               strokeWidth={isProfileActive ? 2.6 : 2.1}
             />
           )}
+           <Text style={{ 
+            fontSize: moderateScale(10),
+            color: isProfileActive ? COLORS.navActive : '#4A5D78' }}>Profile</Text>
           {isProfileActive && <View style={styles.activeDot} />}
         </Pressable>
       </View>

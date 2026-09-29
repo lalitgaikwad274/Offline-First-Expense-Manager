@@ -15,7 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BarChart3, Grid2x2, Plus, Receipt } from 'lucide-react-native';
 import { useAppDispatch, useAppSelector } from '../store';
-import { addExpense, setActiveTab, setSelectedPeriod, toggleOffline } from '../store/expenseSlice';
+import { setActiveTab, setSelectedPeriod, setUserDetail, toggleOffline } from '../store/expenseSlice';
 import { Expense } from '../types/expense';
 import { COLORS, SPACING, TYPOGRAPHY, moderateScale } from '../utils/constants';
 // Modular Components
@@ -31,6 +31,7 @@ import { getAuth, signOut } from '@react-native-firebase/auth';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SCREEN_NAMES } from '../utils/screenNames';
 import { getBankDetails, getTransactions } from '../store/api';
+import { set } from '@react-native-firebase/app/dist/module/internal/web/firebaseDatabase';
 
 const QUICK_ACTIONS = [
   {
@@ -67,6 +68,17 @@ export const ExpenseDashboard: React.FC = () => {
     user,
   } = useAppSelector(state => state.expense);
 
+  useEffect(()=>{
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      dispatch(setUserDetail({
+        id: currentUser?.uid || "",
+        name: currentUser?.displayName || "",
+        initials: (currentUser?.displayName || "").trim()[0]?.toUpperCase() || "",
+        notificationCount: 0,
+      }))
+  }, [])
+
   const navigation = useNavigation<any>();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -81,30 +93,30 @@ export const ExpenseDashboard: React.FC = () => {
     dispatch(getBankDetails());
   }, [dispatch]);
 
-  const handleLogoutRequest = useCallback(() => {
-    setIsDrawerOpen(false);
-    setTimeout(() => {
-      Alert.alert(
-        'Log Out',
-        'Are you sure you want to log out of Expensio?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Log Out',
-            style: 'destructive',
-            onPress: async () => {
-              try {
-                const auth = getAuth();
-                await signOut(auth);
-              } catch (error: any) {
-                Alert.alert('Error', error?.message || 'Failed to log out');
-              }
-            },
-          },
-        ]
-      );
-    }, Platform.OS === 'android' ? 200 : 50);
-  }, []);
+  // const handleLogoutRequest = useCallback(() => {
+  //   setIsDrawerOpen(false);
+  //   setTimeout(() => {
+  //     Alert.alert(
+  //       'Log Out',
+  //       'Are you sure you want to log out of Expensio?',
+  //       [
+  //         { text: 'Cancel', style: 'cancel' },
+  //         {
+  //           text: 'Log Out',
+  //           style: 'destructive',
+  //           onPress: async () => {
+  //             try {
+  //               const auth = getAuth();
+  //               await signOut(auth);
+  //             } catch (error: any) {
+  //               Alert.alert('Error', error?.message || 'Failed to log out');
+  //             }
+  //           },
+  //         },
+  //       ]
+  //     );
+  //   }, Platform.OS === 'android' ? 200 : 50);
+  // }, []);
 
   // Compute financial metrics via Redux state
   const totalExpenses = useMemo(() => {

@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
   bankSection: {
     position: 'relative',
     zIndex: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(20),
     padding: moderateScale(18),
     marginBottom: moderateScale(16),
@@ -683,7 +683,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   amountCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(20),
     padding: moderateScale(20),
     alignItems: 'center',
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
   formSection: {
     position: 'relative',
     zIndex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(20),
     padding: moderateScale(18),
     marginBottom: moderateScale(18),

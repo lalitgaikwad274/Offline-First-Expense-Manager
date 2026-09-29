@@ -42,15 +42,37 @@ const LoginScreen = () => {
         }
         try {
             setLoading(true);
-            const result = await serverCall(ENDPOINTS.LOGIN, "POST")
-            console.log('Server response result:', result);
-            if( result.status === "success" && result?.user) {
-                dispatch(setUserDetail({
-                    id: result.user.uid,
-                    name: result.user?.displayName?.trim() || "",
-                    initials: result.user?.displayName?.trim()[0]?.toUpperCase() || "",
-                    notificationCount: 0,
-                })) 
+            const auth = getAuth();
+            const userCredential = await signInWithEmailAndPassword(
+                auth,
+                email.trim(),
+                password
+            );
+
+            // Call backend login to sync/fetch user details in database
+            try {
+                const result = await serverCall(ENDPOINTS.LOGIN, "POST");
+                const backendUser = result?.data?.user;
+                if (backendUser) {
+                    dispatch(setUserDetail({
+                        id: backendUser.id || userCredential.user.uid,
+                        name: backendUser.name?.trim() || userCredential.user.displayName?.trim() || email.split('@')[0],
+                        initials: (backendUser.name?.trim() || userCredential.user.displayName?.trim() || email)[0]?.toUpperCase() || "U",
+                        email: backendUser.email || userCredential.user.email || email,
+                        notificationCount: 0,
+                    }));
+                }
+            } catch (apiError) {
+                console.warn('Backend login sync warning:', apiError);
+                if (userCredential.user) {
+                    dispatch(setUserDetail({
+                        id: userCredential.user.uid,
+                        name: userCredential.user.displayName?.trim() || email.split('@')[0],
+                        initials: (userCredential.user.displayName?.trim() || email)[0]?.toUpperCase() || "U",
+                        email: userCredential.user.email || email,
+                        notificationCount: 0,
+                    }));
+                }
             }
 
             Alert.alert('Success', 'Logged in successfully!');
