@@ -42,8 +42,16 @@ export const serverCall = async (
       };
 
       const response = await axios(config);
-
-      return response.data;
+      if (response?.status == 200 || response?.status == 201 || response?.status == 202) {
+         return {
+            success: true,
+            data: response.data
+         }
+      }
+      return {
+         success: false,
+         data: []
+      };
    } catch (error: any) {
       if (axios.isAxiosError(error)) {
          console.error(`API Error [${error.code || 'UNKNOWN'}]:`, {

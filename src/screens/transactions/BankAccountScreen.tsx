@@ -488,8 +488,13 @@ const BankAccountScreen: React.FC<Partial<BankDetailsModalProps>> = props => {
       setIsFetching(true);
       const res = await serverCall(ENDPOINTS.GET_BANK_ACCOUNT, 'GET');
       console.log("#### GET_BANK_ACCOUNT", res)
-      if (Array.isArray(res) && res.length > 0) {
-        const formatted: BankAccountItem[] = res.map((item: any) => ({
+      const accountList = Array.isArray(res)
+        ? res
+        : Array.isArray(res?.data)
+        ? res.data
+        : [];
+      if (accountList.length > 0) {
+        const formatted: BankAccountItem[] = accountList.map((item: any) => ({
           id: item.id?.toString() || Math.random().toString(),
           bankName: item.bank_name || 'Bank Account',
           accountName: item.account_name || 'Account',

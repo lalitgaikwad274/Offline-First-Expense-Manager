@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Expense, UserProfile } from '../types/expense';
-import { COLORS } from '../utils/colors';
+import { BankAccountItem } from '../screens/transactions/BankAccountScreen';
 
 export interface ExpenseState {
   expenses: Expense[];
@@ -9,17 +9,19 @@ export interface ExpenseState {
   isOffline: boolean;
   activeTab: string;
   user: UserProfile;
+  bankAccounts: BankAccountItem[]
 }
 
 const initialExpenses: Expense[] = [];
 
 const initialState: ExpenseState = {
   expenses: initialExpenses,
-  income: 30000,
+  income: 0,
   selectedPeriod: 'This Month',
   isOffline: true, // Demo default showing offline capability
   activeTab: 'home',
   user: {},
+  bankAccounts: []
 };
 
 export const expenseSlice = createSlice({
@@ -39,7 +41,13 @@ export const expenseSlice = createSlice({
       state.expenses = action.payload;
     },
     setIncome: (state, action: PayloadAction<number>) => {
+      state.income = action.payload;
+    },
+    addIncome: (state, action: PayloadAction<number>) => {
       state.income = state.income + action.payload;
+    },
+    setBankAccounts: (state, action: PayloadAction<BankAccountItem[]>) => {
+      state.bankAccounts = action.payload;
     },
     setOffline: (state, action: PayloadAction<boolean>) => {
       state.isOffline = action.payload;
@@ -65,11 +73,13 @@ export const {
   deleteExpense,
   setExpenses,
   setIncome,
+  addIncome,
   setOffline,
   toggleOffline,
   setSelectedPeriod,
   setActiveTab,
   clearNotifications,
+  setBankAccounts,
 } = expenseSlice.actions;
 
 export default expenseSlice.reducer;

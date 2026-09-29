@@ -1,6 +1,6 @@
 import { serverCall } from "../services/api";
 import { ENDPOINTS } from "../utils/ApiConstants";
-import { setExpenses } from "./expenseSlice";
+import { setBankAccounts, setExpenses, setIncome } from "./expenseSlice";
 import { formatTransaction } from "../utils/helpers";
 import { Expense } from "../types/expense";
 
@@ -12,14 +12,8 @@ export const getTransactions = () => {
 
             // Handle responses whether returned directly as an array or wrapped in data/transactions
             let rawList: any[] = [];
-            if (Array.isArray(result)) {
-                rawList = result;
-            } else if (Array.isArray(result?.data)) {
+            if (Array.isArray(result?.data)) {
                 rawList = result.data;
-            } else if (Array.isArray(result?.transactions)) {
-                rawList = result.transactions;
-            } else if (Array.isArray(result?.result)) {
-                rawList = result.result;
             }
 
             // Format each item into { id, category, amount, date, color, synced }
@@ -36,3 +30,26 @@ export const getTransactions = () => {
         }
     };
 };
+
+export const getBankDetails = () => {
+    return async (dispatch: any) => {
+        try {
+            const result = await serverCall(ENDPOINTS.GET_BANK_ACCOUNT, "GET");
+            console.log("Raw bank details API response:", result);
+            if (result?.success && Array.isArray(result?.data) && result.data.length > 0) {
+                const totalIncome = result.data.reduce(
+                    (acc: number, curr: any) => acc + (Number(curr?.current_balance ?? curr?.balance) || 0),
+                    0
+                );
+                dispatch(setBankAccounts(result?.data))
+                dispatch(setIncome(totalIncome));
+            } else {
+                dispatch(setIncome(0));
+            }
+            
+        } catch (error) {
+            console.error("Error in getBankDetails:", error);
+            throw error;
+        }
+    };
+}

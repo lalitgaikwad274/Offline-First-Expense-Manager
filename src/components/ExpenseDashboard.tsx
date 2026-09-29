@@ -30,7 +30,7 @@ import BottomNavigation from './BottomNavigation';
 import { getAuth, signOut } from '@react-native-firebase/auth';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SCREEN_NAMES } from '../utils/screenNames';
-import { getTransactions } from '../store/api';
+import { getBankDetails, getTransactions } from '../store/api';
 
 const QUICK_ACTIONS = [
   {
@@ -78,6 +78,7 @@ export const ExpenseDashboard: React.FC = () => {
 
   useEffect(() => {
     dispatch(getTransactions());
+    dispatch(getBankDetails());
   }, [dispatch]);
 
   const handleLogoutRequest = useCallback(() => {

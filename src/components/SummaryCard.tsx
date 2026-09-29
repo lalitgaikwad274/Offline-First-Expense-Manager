@@ -44,7 +44,7 @@ export interface SummaryCardProps {
    CONFIG
 ========================================================= */
 
-const DEFAULT_TARGET_AMOUNT = 25000;
+const DEFAULT_TARGET_AMOUNT = 10000;
 const CARD_HEIGHT = moderateScale(222);
 
 interface CardTheme {

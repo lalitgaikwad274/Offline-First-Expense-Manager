@@ -21,7 +21,7 @@ import {
   Tag,
 } from 'lucide-react-native';
 import { useAppDispatch } from '../../store';
-import { addExpense, setIncome } from '../../store/expenseSlice';
+import { addExpense, addIncome, setIncome } from '../../store/expenseSlice';
 import { COLORS, moderateScale, SHADOWS } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
 import { ExpenseCategory } from '../../types/expense';
@@ -29,6 +29,7 @@ import BankDropdown, { Bank } from '../../components/BankDropdown';
 import { ENDPOINTS } from '../../utils/ApiConstants';
 import { serverCall } from '../../services/api';
 import { formatTransactionDate } from '../../utils/helpers';
+import { useSelector } from 'react-redux';
 
 const CATEGORIES: { label: ExpenseCategory; color: string }[] = [
   { label: 'Food & Dining', color: '#FF6B6B' },
@@ -300,6 +301,8 @@ const AddExpenseScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
 
+  const bankAccounts = useSelector((state: any) => state.expense.bankAccounts);
+
   const [transactionType, setTransactionType] = useState<'debit' | 'credit'>('debit');
   const isCredit = transactionType === 'credit';
 
@@ -360,7 +363,7 @@ const AddExpenseScreen: React.FC = () => {
       newExpense.synced = false;
     }
 
-    isCredit && dispatch(setIncome(parsedAmount));
+    isCredit && dispatch(addIncome(parsedAmount));
     dispatch(addExpense(newExpense));
 
     Alert.alert(
@@ -483,7 +486,7 @@ const AddExpenseScreen: React.FC = () => {
             </View>
 
             <BankDropdown
-              banks={banklist}
+              banks={bankAccounts}
               value={selectedBank}
               placeholder="Select your bank"
               onChange={setSelectedBank}

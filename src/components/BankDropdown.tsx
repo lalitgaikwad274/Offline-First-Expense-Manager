@@ -7,7 +7,7 @@ import { SPACING } from '../utils/spacing';
 
 export interface Bank {
     id: string;
-    name: string;
+    bank_name: string;
     icon: string;
 }
 
@@ -163,7 +163,7 @@ const BankDropdown = memo(({
                             style={styles.selectedText}
                             numberOfLines={1}
                         >
-                            {selectedBank.name}
+                            {selectedBank.bank_name}
                         </Text>
                     </>
                 ) : (
@@ -210,7 +210,7 @@ const BankDropdown = memo(({
                                         style={styles.bankName}
                                         numberOfLines={1}
                                     >
-                                        {item.name}
+                                        {item?.bank_name}
                                     </Text>
 
                                     {isSelected && (
