@@ -8,6 +8,7 @@ import AnalyticsScreen from '../screens/analytics/AnalyticsScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import { SCREEN_NAMES } from '../utils/screenNames';
 import { ExpenseDashboard } from '../components';
+import BankAccountScreen from '../screens/transactions/BankAccountScreen';
 
 export type AppStackParamList = {
   Home: undefined;
@@ -18,6 +19,7 @@ export type AppStackParamList = {
   };
   Analytics: undefined;
   Profile: undefined;
+  BankAccountScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -58,6 +60,11 @@ const AppNavigator = () => {
       <Stack.Screen
         name= {SCREEN_NAMES.PROFILE}
         component={ProfileScreen}
+      />
+
+      <Stack.Screen
+        name= {SCREEN_NAMES.BANK_ACCOUNT_SCREEN}
+        component={BankAccountScreen}
       />
 
     </Stack.Navigator>

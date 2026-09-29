@@ -70,9 +70,13 @@ const ProfileScreen: React.FC = () => {
     );
   };
 
+  const handleBankDetail = () => {
+    navigation.navigate(SCREEN_NAMES.BANK_ACCOUNT_SCREEN);
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <StatusBar barStyle="dark-content" />
 
       {/* Screen Header */}
       <View style={styles.header}>
@@ -146,6 +150,18 @@ const ProfileScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>Preferences & Storage</Text>
 
           <View style={styles.menuGroup}>
+           <TouchableOpacity onPress={handleBankDetail} style={styles.menuItem}>
+              <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: 'rgba(51, 154, 240, 0.12)' }]}>
+                  <RefreshCw size={moderateScale(18)} color="#339AF0" strokeWidth={2.2} />
+                </View>
+                <Text style={styles.menuLabel}>Add Bank Details</Text>
+              </View>
+              <ChevronRight size={moderateScale(18)} color={COLORS.gray} />
+            </TouchableOpacity>
+
+            <View style={styles.itemDivider} />
+
             <TouchableOpacity onPress={handleSyncData} style={styles.menuItem}>
               <View style={styles.menuLeft}>
                 <View style={[styles.menuIconBox, { backgroundColor: 'rgba(51, 154, 240, 0.12)' }]}>
@@ -267,7 +283,7 @@ const styles = StyleSheet.create({
     paddingBottom: moderateScale(100),
   },
   userCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(20),
     padding: moderateScale(20),
     alignItems: 'center',
@@ -333,7 +349,7 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(16),
     paddingVertical: moderateScale(14),
     marginBottom: moderateScale(16),
@@ -379,7 +395,7 @@ const styles = StyleSheet.create({
     marginLeft: moderateScale(4),
   },
   menuGroup: {
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(16),
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.88)',
@@ -428,7 +444,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     paddingVertical: moderateScale(14),
     borderRadius: moderateScale(16),
     gap: moderateScale(8),

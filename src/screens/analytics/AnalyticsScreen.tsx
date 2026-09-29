@@ -85,7 +85,7 @@ const AnalyticsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <StatusBar barStyle="dark-content" />
 
       {/* Screen Header */}
       <View style={styles.header}>
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   periodBadge: {
-    backgroundColor: 'rgba(219, 245, 248, 0.9)',
+    backgroundColor: 'rgba(219, 245, 248, 0.95)',
     paddingHorizontal: moderateScale(12),
     paddingVertical: moderateScale(6),
     borderRadius: moderateScale(14),
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     paddingBottom: moderateScale(100),
   },
   heroCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(20),
     padding: moderateScale(18),
     borderWidth: 1,
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     width: moderateScale(50),
     height: moderateScale(50),
     borderRadius: moderateScale(25),
-    backgroundColor: 'rgba(219, 245, 248, 0.7)',
+    backgroundColor: 'rgba(219, 245, 248, 0.95)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   },
   progressBarTrack: {
     height: moderateScale(8),
-    backgroundColor: 'rgba(219, 237, 240, 0.6)',
+    backgroundColor: 'rgba(219, 237, 240, 0.95)',
     borderRadius: moderateScale(4),
     overflow: 'hidden',
   },
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: moderateScale(28),
-    backgroundColor: 'rgba(219, 237, 240, 0.8)',
+    backgroundColor: 'rgba(219, 237, 240, 0.95)',
   },
   statIconBadge: {
     width: moderateScale(32),
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     color: COLORS.navy,
   },
   syncCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(16),
     padding: moderateScale(16),
     borderWidth: 1,
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     marginBottom: moderateScale(10),
   },
   emptyCategories: {
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     padding: moderateScale(24),
     borderRadius: moderateScale(16),
     borderWidth: 1,
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
   },
   categoryCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(14),
     padding: moderateScale(14),
     marginBottom: moderateScale(10),

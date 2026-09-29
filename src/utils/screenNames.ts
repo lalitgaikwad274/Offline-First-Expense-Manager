@@ -10,4 +10,5 @@ export const SCREEN_NAMES = {
   EXPENSE_DETAILS: 'ExpenseDetails',
   ANALYTICS: 'Analytics',
   PROFILE: 'Profile',
+  BANK_ACCOUNT_SCREEN: "BankAccountScreen",
 } as const;
