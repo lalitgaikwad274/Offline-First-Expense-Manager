@@ -29,6 +29,7 @@ import {
 } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
 import ExpenseCard from '../../components/ExpenseCard';
+import BottomNavigation from '../../components/BottomNavigation';
 
 const FILTER_OPTIONS = ['All', 'Synced', 'Pending'] as const;
 
@@ -1003,6 +1004,12 @@ const TransactionsScreen: React.FC = () => {
           />
         )}
       </View>
+
+      {/* Floating Bottom Navigation */}
+      <BottomNavigation
+        activeTab="transactions"
+        floating
+      />
 
       {/* =================================================
           DATE FILTER MODAL

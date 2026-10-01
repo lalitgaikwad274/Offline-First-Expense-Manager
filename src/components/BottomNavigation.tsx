@@ -13,7 +13,8 @@ import { BarChart3, Home, Plus, Receipt, User } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, moderateScale } from '../utils/constants';
 import { SCREEN_NAMES } from '../utils/screenNames';
-import { useAppSelector } from '../store';
+import { useAppDispatch } from '../store';
+import { setActiveTab } from '../store/expenseSlice';
 
 export type TabId = 'home' | 'transactions' | 'add' | 'analytics' | 'profile';
 
@@ -40,7 +41,7 @@ export const BottomNavigation = memo(({
   onAddPress,
   userAvatarUri,
   translateY,
-  floating = true,
+  floating = false,
 }: BottomNavigationProps) => {
   const navigation = useNavigation<any>();
   let insets = { bottom: 0 };
@@ -50,15 +51,17 @@ export const BottomNavigation = memo(({
     insets = { bottom: Platform.OS === 'ios' ? moderateScale(16) : moderateScale(8) };
   }
 
-  const reduxUser = useAppSelector(state => state.expense?.user);
+  const dispatch = useAppDispatch();
 
   const handleTabPress = useCallback((tabId: TabId) => {
+    dispatch(setActiveTab(tabId));
+
     if (onTabPress) {
       onTabPress(tabId);
       return;
     }
 
-    if (tabId === activeTab && tabId !== 'add') return;
+    if (tabId === activeTab) return;
 
     switch (tabId) {
       case 'home':
@@ -81,7 +84,7 @@ export const BottomNavigation = memo(({
         navigation.navigate(SCREEN_NAMES.PROFILE);
         break;
     }
-  }, [activeTab, navigation, onAddPress, onTabPress]);
+  }, [activeTab, dispatch, navigation, onAddPress, onTabPress]);
 
   const isHomeActive = activeTab === 'home';
   const isTransactionsActive = activeTab === 'transactions';

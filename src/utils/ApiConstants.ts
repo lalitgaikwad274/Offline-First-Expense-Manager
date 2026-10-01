@@ -1,5 +1,5 @@
 
-const isProd = false
+const isProd = true
 export const BASE_URL = isProd ? "https://expensio-backend-a96v.onrender.com" : "http://192.168.1.64:8000"
 
 

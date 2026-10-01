@@ -24,6 +24,7 @@ import { useAppSelector } from '../../store';
 import { COLORS, moderateScale, SHADOWS } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
 import { ExpenseCategory } from '../../types/expense';
+import BottomNavigation from '../../components/BottomNavigation';
 
 const CATEGORY_COLORS: Record<string, string> = {
   'Food & Dining': '#FF6B6B',
@@ -235,6 +236,12 @@ const AnalyticsScreen: React.FC = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Floating Bottom Navigation */}
+      <BottomNavigation
+        activeTab="analytics"
+        floating
+      />
     </SafeAreaView>
   );
 };

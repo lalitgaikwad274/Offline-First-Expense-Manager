@@ -428,36 +428,6 @@ export const BankDetailsModal: React.FC<BankDetailsModalProps> = ({
   );
 };
 
-const DEFAULT_ACCOUNTS: BankAccountItem[] = [
-  {
-    id: '1',
-    bankName: 'HDFC Bank',
-    accountName: 'Salary Account',
-    accountType: 'Savings',
-    lastFour: '4821',
-    balance: 28450,
-    initial: 'H',
-  },
-  {
-    id: '2',
-    bankName: 'ICICI Bank',
-    accountName: 'Personal Savings',
-    accountType: 'Savings',
-    lastFour: '9034',
-    balance: 12180,
-    initial: 'I',
-  },
-  {
-    id: '3',
-    bankName: 'State Bank of India',
-    accountName: 'Emergency Fund',
-    accountType: 'Savings',
-    lastFour: '2210',
-    balance: 1950,
-    initial: 'S',
-  },
-];
-
 /**
  * BankDetails (Default Export)
  * Acts both as a standalone Screen and can be invoked directly as a Modal if passed visible/onClose props.
@@ -476,7 +446,7 @@ const BankAccountScreen: React.FC<Partial<BankDetailsModalProps>> = props => {
 
   const navigation = useNavigation<any>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [accounts, setAccounts] = useState<BankAccountItem[]>(DEFAULT_ACCOUNTS);
+  const [accounts, setAccounts] = useState<BankAccountItem[]>([]);
   const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {

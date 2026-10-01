@@ -20,18 +20,15 @@ import { Expense } from '../types/expense';
 import { COLORS, SPACING, TYPOGRAPHY, moderateScale } from '../utils/constants';
 // Modular Components
 import Header from './Header';
-import DrawerNavigation from './DrawerNavigation';
-import OfflineBanner from './OfflineBanner';
 import SummaryCard from './SummaryCard';
-import FinancialCard from './FinancialCard';
 import CategoryItem from './CategoryItem';
 import ExpenseCard from './ExpenseCard';
 import BottomNavigation from './BottomNavigation';
-import { getAuth, signOut } from '@react-native-firebase/auth';
+import { getAuth } from '@react-native-firebase/auth';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SCREEN_NAMES } from '../utils/screenNames';
 import { getBankDetails, getTransactions } from '../store/api';
-import { set } from '@react-native-firebase/app/dist/module/internal/web/firebaseDatabase';
+import NoBankAccountCard from './NoBankAccountCard';
 
 const QUICK_ACTIONS = [
   {
@@ -295,14 +292,22 @@ export const ExpenseDashboard: React.FC = () => {
               />
 
               {/* Expense Gradient Summary Card */}
-              <SummaryCard
-                totalAmount={totalExpenses}
-                incomeAmount={income}
-                balanceAmount={balance}
-                selectedPeriod={selectedPeriod}
-                trendPercentage={12}
-                onPeriodPress={handlePeriodChange}
-              />
+              {income > 0 ? (
+                <SummaryCard
+                  totalAmount={totalExpenses}
+                  incomeAmount={income}
+                  balanceAmount={balance}
+                  selectedPeriod={selectedPeriod}
+                  trendPercentage={12}
+                  onPeriodPress={handlePeriodChange}
+                />
+              ) : (
+                <NoBankAccountCard
+                  onAddAccount={() =>
+                    navigation.navigate(SCREEN_NAMES.BANK_ACCOUNT_SCREEN)
+                  }
+                />
+              )}
 
               {/* Quick Actions Grid */}
               <View style={styles.section}>
@@ -366,7 +371,7 @@ export const ExpenseDashboard: React.FC = () => {
         <BottomNavigation
           activeTab="home"
           onTabPress={handleTabPress}
-          translateY={navTranslateY}
+          // translateY={navTranslateY} // for smooth slide up-down animation
           floating
         />
       </View>

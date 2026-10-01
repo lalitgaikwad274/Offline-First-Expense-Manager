@@ -151,9 +151,9 @@ export const formatTransaction = (item: any, fallbackId?: string): Expense => {
   const category = (item.category || item?.description || item.type || 'Other') as ExpenseCategory;
   const color = item.color || getCategoryColor(category);
   const amount = typeof item.amount === 'number' ? item.amount : parseFloat(item.amount) || 0;
-  const date = formatTransactionDate(item.date || item.createdAt || item.timestamp);
+  const date = formatTransactionDate(item.transaction_date || item.created_at);
   const synced = item.synced !== undefined ? Boolean(item.synced) : true;
-  const id = String(item.id || item._id || item.transactionId || fallbackId || Date.now().toString());
+  const id = String(item.id || item.transactionId || fallbackId || Date.now().toString());
 
   return {
     id,

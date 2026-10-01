@@ -44,8 +44,7 @@ export interface SummaryCardProps {
    CONFIG
 ========================================================= */
 
-const DEFAULT_TARGET_AMOUNT = 10000;
-const CARD_HEIGHT = moderateScale(222);
+const CARD_HEIGHT = moderateScale(200);
 
 interface CardTheme {
   isTargetReached: boolean;
@@ -260,7 +259,7 @@ export const SummaryCard = memo(
       typeof balanceAmount === 'number'
         ? balanceAmount
         : currentIncome - currentTotal;
-    const effectiveTarget = incomeAmount > 0 ? incomeAmount : DEFAULT_TARGET_AMOUNT;
+    const effectiveTarget = incomeAmount > 0 ? incomeAmount : 0;
 
     const expenseProgress = useMemo(() => {
       if (currentTotal <= 0) {
@@ -268,11 +267,7 @@ export const SummaryCard = memo(
       }
       return Math.min(currentTotal / effectiveTarget, 1);
     }, [currentTotal, effectiveTarget]);
-
     const percentageDisplay = useMemo(() => {
-      if (trendPercentage !== undefined) {
-        return trendPercentage;
-      }
       return Math.round(expenseProgress * 100);
     }, [trendPercentage, expenseProgress]);
 
@@ -432,18 +427,18 @@ export const SummaryCard = memo(
                   )}
                 </View>
 
-                <Text
+                {/* <Text
                   style={[
                     styles.progressPercentText,
                     { color: theme.progressTextColor },
                   ]}
                 >
                   {Math.round(expenseProgress * 100)}%
-                </Text>
+                </Text> */}
               </View>
 
               {/* Mini Chart Bars */}
-              <View style={styles.chartBars}>
+              {/* <View style={styles.chartBars}>
                 <View
                   style={[
                     styles.chartBar,
@@ -474,7 +469,7 @@ export const SummaryCard = memo(
                     },
                   ]}
                 />
-              </View>
+              </View> */}
             </View>
           </View>
 

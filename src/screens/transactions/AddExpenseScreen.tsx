@@ -350,7 +350,7 @@ const AddExpenseScreen: React.FC = () => {
       title: title.trim() || (isCredit ? 'Credit' : selectedCategory),
       type: transactionType,
       bankId: selectedBank?.id,
-      bankName: selectedBank?.name,
+      bankName: selectedBank?.bank_name,
       notes: notes.trim() || undefined,
     };
 
@@ -368,7 +368,7 @@ const AddExpenseScreen: React.FC = () => {
 
     Alert.alert(
       isCredit ? 'Credit Recorded' : 'Expense Recorded',
-      `₹${parsedAmount.toLocaleString('en-IN')} ${isCredit ? 'credited' : 'added'}${selectedBank ? ` to ${selectedBank.name}` : ''}.`,
+      `₹${parsedAmount.toLocaleString('en-IN')} ${isCredit ? 'credited' : 'added'}${selectedBank ? ` to ${selectedBank.bank_name}` : ''}.`,
       [
         {
           text: 'View Transactions',
