@@ -9,7 +9,8 @@ export interface ExpenseState {
   isOffline: boolean;
   activeTab: string;
   user: UserProfile;
-  bankAccounts: BankAccountItem[]
+  bankAccounts: BankAccountItem[];
+  isLoading: boolean;
 }
 
 const initialExpenses: Expense[] = [];
@@ -21,7 +22,8 @@ const initialState: ExpenseState = {
   isOffline: true, // Demo default showing offline capability
   activeTab: 'home',
   user: {},
-  bankAccounts: []
+  bankAccounts: [],
+  isLoading: true,
 };
 
 export const expenseSlice = createSlice({
@@ -64,6 +66,9 @@ export const expenseSlice = createSlice({
     clearNotifications: (state) => {
       state.user.notificationCount = 0;
     },
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
   },
 });
 
@@ -80,6 +85,7 @@ export const {
   setActiveTab,
   clearNotifications,
   setBankAccounts,
+  setIsLoading,
 } = expenseSlice.actions;
 
 export default expenseSlice.reducer;

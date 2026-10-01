@@ -121,7 +121,7 @@ export const BottomNavigation = memo(({
           <Home
             size={NAV_CONSTANTS.iconSize}
             color={isHomeActive ? COLORS.navActive : '#4A5D78'}
-            strokeWidth={isHomeActive ? 2.6 : 2.1}
+            strokeWidth={isHomeActive ? 2 : 1.7}
           />
           <Text style={{ 
             fontSize: moderateScale(10),
@@ -141,7 +141,7 @@ export const BottomNavigation = memo(({
           <Receipt
             size={NAV_CONSTANTS.iconSize}
             color={isTransactionsActive ? COLORS.navActive : '#4A5D78'}
-            strokeWidth={isTransactionsActive ? 2.6 : 2.1}
+            strokeWidth={isTransactionsActive ? 2 : 1.7}
           />
           <Text style={{ 
             fontSize: moderateScale(10),
@@ -164,7 +164,7 @@ export const BottomNavigation = memo(({
               <Plus
                 size={moderateScale(26)}
                 color={COLORS.white}
-                strokeWidth={3}
+                strokeWidth={2.3}
               />
             </View>
           </Pressable>
@@ -182,7 +182,7 @@ export const BottomNavigation = memo(({
           <BarChart3
             size={NAV_CONSTANTS.iconSize}
             color={isAnalyticsActive ? COLORS.navActive : '#4A5D78'}
-            strokeWidth={isAnalyticsActive ? 2.6 : 2.1}
+            strokeWidth={isAnalyticsActive ? 2 : 1.7}
           />
            <Text style={{ 
             fontSize: moderateScale(10),
@@ -207,7 +207,7 @@ export const BottomNavigation = memo(({
             <User
               size={NAV_CONSTANTS.iconSize}
               color={isProfileActive ? COLORS.navActive : '#4A5D78'}
-              strokeWidth={isProfileActive ? 2.6 : 2.1}
+              strokeWidth={isProfileActive ? 2 : 1.7}
             />
           )}
            <Text style={{ 

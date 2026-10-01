@@ -1,12 +1,13 @@
 import { serverCall } from "../services/api";
 import { ENDPOINTS } from "../utils/ApiConstants";
-import { setBankAccounts, setExpenses, setIncome } from "./expenseSlice";
+import { setBankAccounts, setExpenses, setIncome, setIsLoading } from "./expenseSlice";
 import { formatTransaction } from "../utils/helpers";
 import { Expense } from "../types/expense";
 
 export const getTransactions = () => {
     return async (dispatch: any) => {
         try {
+            dispatch(setIsLoading(true));
             const result = await serverCall(ENDPOINTS.GET_TRANSACTION, "GET");
             console.log("Raw transactions API response:", result);
 
@@ -27,6 +28,8 @@ export const getTransactions = () => {
         } catch (error) {
             console.error("Error in getTransactions:", error);
             throw error;
+        } finally {
+            dispatch(setIsLoading(false));
         }
     };
 };

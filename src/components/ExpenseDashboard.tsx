@@ -29,6 +29,12 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SCREEN_NAMES } from '../utils/screenNames';
 import { getBankDetails, getTransactions } from '../store/api';
 import NoBankAccountCard from './NoBankAccountCard';
+import SpendingOverviewCard from './SpendingOverviewCard';
+import {
+  SummaryCardSkeleton,
+  SpendingOverviewSkeleton,
+  RecentExpensesSkeleton,
+} from './Shimmer';
 
 const QUICK_ACTIONS = [
   {
@@ -85,10 +91,35 @@ export const ExpenseDashboard: React.FC = () => {
     }, [dispatch])
   );
 
+  const reduxIsLoading = useAppSelector(state => state.expense.isLoading);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
   useEffect(() => {
-    dispatch(getTransactions());
-    dispatch(getBankDetails());
+    let isMounted = true;
+    const fetchDashboardData = async () => {
+      try {
+        setIsDataLoading(true);
+        await Promise.allSettled([
+          dispatch(getTransactions()),
+          dispatch(getBankDetails()),
+        ]);
+      } catch (err) {
+        console.log('Error fetching dashboard data:', err);
+      } finally {
+        if (isMounted) {
+          setIsDataLoading(false);
+        }
+      }
+    };
+
+    fetchDashboardData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [dispatch]);
+
+  const isLoading = isDataLoading || reduxIsLoading;
 
   // const handleLogoutRequest = useCallback(() => {
   //   setIsDrawerOpen(false);
@@ -161,15 +192,15 @@ export const ExpenseDashboard: React.FC = () => {
     dispatch(setSelectedPeriod(periods[nextIndex]));
   }, [dispatch, selectedPeriod]);
 
-  const handleToggleOffline = useCallback(() => {
-    dispatch(toggleOffline());
-    Alert.alert(
-      'Network Mode Toggled',
-      isOffline
-        ? 'Status: Online. Background sync engine running.'
-        : 'Status: Offline mode enabled. Transactions saved locally in SQLite.'
-    );
-  }, [dispatch, isOffline]);
+  // const handleToggleOffline = useCallback(() => {
+  //   dispatch(toggleOffline());
+  //   Alert.alert(
+  //     'Network Mode Toggled',
+  //     isOffline
+  //       ? 'Status: Online. Background sync engine running.'
+  //       : 'Status: Offline mode enabled. Transactions saved locally in SQLite.'
+  //   );
+  // }, [dispatch, isOffline]);
 
   const handleTabPress = useCallback(
     (tabId: string) => {
@@ -291,8 +322,10 @@ export const ExpenseDashboard: React.FC = () => {
                 onProfilePress={() => dispatch(setActiveTab('profile'))}
               />
 
-              {/* Expense Gradient Summary Card */}
-              {income > 0 ? (
+              {/* Expense Gradient Summary Card or Shimmer Skeleton */}
+              {isLoading ? (
+                <SummaryCardSkeleton />
+              ) : income > 0 ? (
                 <SummaryCard
                   totalAmount={totalExpenses}
                   incomeAmount={income}
@@ -326,6 +359,9 @@ export const ExpenseDashboard: React.FC = () => {
                 </View>
               </View>
 
+              {/* Spending Overview Section */}
+              <SpendingOverviewCard isLoading={isLoading} />
+
               {/* Recent Transactions Unified Card Section */}
               <View style={styles.recentSection}>
                 <View style={styles.recentHeader}>
@@ -338,30 +374,34 @@ export const ExpenseDashboard: React.FC = () => {
                   </Pressable>
                 </View>
 
-                <View style={styles.recentUnifiedCard}>
-                  {recentExpenses.length === 0 ? (
-                    <View style={styles.emptyRecent}>
-                      <Receipt
-                        size={moderateScale(32)}
-                        color={COLORS.gray}
-                        strokeWidth={1.8}
-                      />
-                      <Text style={styles.emptyRecentText}>
-                        No recent transactions recorded
-                      </Text>
-                    </View>
-                  ) : (
-                    recentExpenses.map((item, index) => (
-                      <ExpenseCard
-                        key={item.id}
-                        item={item}
-                        variant="row"
-                        isLast={index === recentExpenses.length - 1}
-                        onPress={handleExpensePress}
-                      />
-                    ))
-                  )}
-                </View>
+                {isLoading ? (
+                  <RecentExpensesSkeleton />
+                ) : (
+                  <View style={styles.recentUnifiedCard}>
+                    {recentExpenses.length === 0 ? (
+                      <View style={styles.emptyRecent}>
+                        <Receipt
+                          size={moderateScale(32)}
+                          color={COLORS.gray}
+                          strokeWidth={1.8}
+                        />
+                        <Text style={styles.emptyRecentText}>
+                          No recent transactions recorded
+                        </Text>
+                      </View>
+                    ) : (
+                      recentExpenses.map((item, index) => (
+                        <ExpenseCard
+                          key={item.id}
+                          item={item}
+                          variant="row"
+                          isLast={index === recentExpenses.length - 1}
+                          onPress={handleExpensePress}
+                        />
+                      ))
+                    )}
+                  </View>
+                )}
               </View>
             </>
           }
@@ -406,13 +446,13 @@ const styles = StyleSheet.create({
     marginTop: moderateScale(14),
   },
   recentSection: {
-    marginBottom: SPACING.xl,
+    marginTop: moderateScale(14)
   },
   recentHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.lg,
   },
   seeAll: {
     color: COLORS.expense,

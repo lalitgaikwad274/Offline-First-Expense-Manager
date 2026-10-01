@@ -8,6 +8,7 @@ export const FONT_SIZES = {
   bodySmall: moderateScale(13),
   body: moderateScale(15),
   bodyLarge: moderateScale(17),
+  heading: moderateScale(18),
   subheading: moderateScale(19),
   headingSmall: moderateScale(22),
   headingMedium: moderateScale(25),
@@ -38,7 +39,7 @@ export const TYPOGRAPHY: Record<string, TextStyle> = {
     letterSpacing: -0.5,
   },
   h2: {
-    fontSize: FONT_SIZES.headingMedium,
+    fontSize: FONT_SIZES.heading,
     fontWeight: FONT_WEIGHTS.extraBold,
     color: COLORS.textPrimary,
     letterSpacing: -0.4,

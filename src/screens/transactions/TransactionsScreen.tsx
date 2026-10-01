@@ -30,6 +30,7 @@ import {
 import { SCREEN_NAMES } from '../../utils/screenNames';
 import ExpenseCard from '../../components/ExpenseCard';
 import BottomNavigation from '../../components/BottomNavigation';
+import { RecentExpensesSkeleton } from '../../components/Shimmer';
 
 const FILTER_OPTIONS = ['All', 'Synced', 'Pending'] as const;
 
@@ -290,6 +291,10 @@ const TransactionsScreen: React.FC = () => {
 
   const expenses = useAppSelector(
     state => state.expense.expenses,
+  );
+
+  const isLoading = useAppSelector(
+    state => state.expense.isLoading,
   );
 
   const [selectedFilter, setSelectedFilter] =
@@ -874,7 +879,18 @@ const TransactionsScreen: React.FC = () => {
       <View
         style={styles.listContainer}
       >
-        {filteredExpenses.length ===
+        {isLoading ? (
+          <View
+            style={{
+              paddingHorizontal: moderateScale(16),
+              paddingTop: moderateScale(12),
+              gap: moderateScale(14),
+            }}
+          >
+            <RecentExpensesSkeleton />
+            <RecentExpensesSkeleton />
+          </View>
+        ) : filteredExpenses.length ===
           0 ? (
           <View
             style={
