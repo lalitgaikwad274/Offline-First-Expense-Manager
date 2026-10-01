@@ -19,6 +19,7 @@ import GroupExpenseDetailsScreen from '../screens/GroupExpense/GroupExpenseDetai
 import SettleGroupScreen from '../screens/GroupExpense/SettleGroupScreen';
 import GroupSettingsScreen from '../screens/GroupExpense/GroupSettingsScreen';
 import { GroupMember } from '../types/groupExpense';
+import NotificationScreen from '../screens/notifications/NotificationScreen';
 
 export type AppStackParamList = {
   Home: undefined;
@@ -61,6 +62,7 @@ export type AppStackParamList = {
   GroupSettings: {
     groupId: string;
   };
+  Notifications: undefined;
 };
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -152,6 +154,11 @@ const AppNavigator = () => {
       <Stack.Screen
         name={SCREEN_NAMES.GROUP_SETTINGS}
         component={GroupSettingsScreen}
+      />
+
+      <Stack.Screen
+        name={SCREEN_NAMES.NOTIFICATIONS}
+        component={NotificationScreen}
       />
 
     </Stack.Navigator>

@@ -22,4 +22,5 @@ export const SCREEN_NAMES = {
   GROUP_EXPENSE_DETAILS: 'GroupExpenseDetails',
   SETTLE_GROUP: 'SettleGroup',
   GROUP_SETTINGS: 'GroupSettings',
+  NOTIFICATIONS: 'Notifications',
 } as const;

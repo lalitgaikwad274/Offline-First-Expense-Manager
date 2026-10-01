@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     paddingBottom: moderateScale(28),
   },
   amountCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(20),
     padding: moderateScale(22),
     alignItems: 'center',
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     color: COLORS.petrol,
   },
   detailsCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: moderateScale(18),
     paddingHorizontal: moderateScale(16),
     paddingVertical: moderateScale(10),
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     paddingVertical: moderateScale(14),
     borderRadius: moderateScale(16),
     borderWidth: 1,

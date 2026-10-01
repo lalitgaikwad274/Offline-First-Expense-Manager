@@ -324,10 +324,10 @@ export const ExpenseDashboard: React.FC = () => {
               <Header
                 userName={user.name}
                 userInitials={user.initials}
-                notificationCount={user.notificationCount}
+                notificationCount={user.notificationCount ?? 0}
                 onOpenDrawer={() => setIsDrawerOpen(true)}
                 onNotificationPress={() =>
-                  Alert.alert('Notifications', 'You have 1 pending transaction to sync.')
+                  navigation.navigate(SCREEN_NAMES.NOTIFICATIONS)
                 }
                 onProfilePress={() => dispatch(setActiveTab('profile'))}
               />
