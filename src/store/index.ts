@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import expenseReducer from './expenseSlice';
+import groupExpenseReducer from './groupExpenseSlice';
 
 export const store = configureStore({
   reducer: {
     expense: expenseReducer,
+    groupExpense: groupExpenseReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

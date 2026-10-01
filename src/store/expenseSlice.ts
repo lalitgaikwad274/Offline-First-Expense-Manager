@@ -21,7 +21,7 @@ const initialState: ExpenseState = {
   selectedPeriod: 'This Month',
   isOffline: true, // Demo default showing offline capability
   activeTab: 'home',
-  user: {},
+  user: {} as UserProfile,
   bankAccounts: [],
   isLoading: true,
 };

@@ -70,7 +70,7 @@ const ExpenseDetailsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <StatusBar barStyle="dark-content" />
 
       {/* Screen Header */}
       <View style={styles.header}>

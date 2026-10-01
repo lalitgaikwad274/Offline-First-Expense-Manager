@@ -205,10 +205,9 @@ export const SpendingOverviewCard: React.FC<SpendingOverviewCardProps> = memo(({
 
   // 1. Filter expenses according to selected period
   const filteredExpenses = useMemo(() => {
-    const debits = expenses.filter(item => item.category !== 'Credit');
     const now = new Date();
 
-    return debits.filter(item => {
+    return expenses.filter(item => {
       const d = parseExpenseDate(item.date);
 
       if (period === 'weekly') {
@@ -236,9 +235,9 @@ export const SpendingOverviewCard: React.FC<SpendingOverviewCardProps> = memo(({
     });
   }, [expenses, period]);
 
-  // 2. Real total spend calculated purely from actual filtered expenses
+  // 2. Real total spend calculated purely from actual filtered expenses (net of credit settlements)
   const periodTotal = useMemo(() => {
-    return filteredExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    return Math.max(0, filteredExpenses.reduce((sum, item) => sum + (item.category === 'Credit' ? -Number(item.amount) : Number(item.amount) || 0), 0));
   }, [filteredExpenses]);
 
   // 3. Dynamic active tag index based on current real-time date

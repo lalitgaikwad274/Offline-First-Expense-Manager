@@ -25,11 +25,7 @@ const SplashScreen = ({onFinish}: SplashScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="#F7FBFC"
-        translucent
-      />
+      <StatusBar barStyle="dark-content" />
       <LottieView
         source={require('../Assets/lottie/expense_manager_splash.json')}
         style={styles.animation}

@@ -301,7 +301,7 @@ export const AlertHost: React.FC = () => {
 
 const styles = StyleSheet.create({
   overlayWrapper: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: 99999,
     elevation: 99999,
   },
