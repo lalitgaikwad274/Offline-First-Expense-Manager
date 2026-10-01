@@ -7,13 +7,14 @@ import {
   NativeSyntheticEvent,
   Platform,
   Pressable,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BarChart3, Grid2x2, Plus, Receipt } from 'lucide-react-native';
+import { BarChart3, Grid2x2, Plus, Receipt, Users } from 'lucide-react-native';
 import { useAppDispatch, useAppSelector } from '../store';
 import { setActiveTab, setSelectedPeriod, setUserDetail, toggleOffline } from '../store/expenseSlice';
 import { Expense } from '../types/expense';
@@ -39,7 +40,7 @@ import {
 const QUICK_ACTIONS = [
   {
     id: 'add',
-    title: 'Add Expense',
+    title: 'Add expense',
     icon: Plus,
     isPrimary: true,
   },
@@ -47,6 +48,11 @@ const QUICK_ACTIONS = [
     id: 'transactions',
     title: 'Passbook',
     icon: Receipt,
+  },
+  {
+    id: 'groupExpense',
+    title: 'Group expense',
+    icon: Users,
   },
   {
     id: 'analytics',
@@ -148,7 +154,7 @@ export const ExpenseDashboard: React.FC = () => {
 
   // Compute financial metrics via Redux state
   const totalExpenses = useMemo(() => {
-    return expenses.reduce((sum, item) => sum + (item.category === 'Credit' ? 0 : item.amount), 0);
+    return Math.max(0, expenses.reduce((sum, item) => sum + (item.category === 'Credit' ? -item.amount : item.amount), 0));
   }, [expenses]);
 
   const balance = useMemo(() => {
@@ -165,6 +171,10 @@ export const ExpenseDashboard: React.FC = () => {
 
         case 'transactions':
           navigation.navigate(SCREEN_NAMES.TRANSACTIONS);
+          break;
+
+        case 'groupExpense':
+          navigation.navigate(SCREEN_NAMES.GROUP_EXPENSES);
           break;
 
         case 'analytics':
@@ -342,10 +352,15 @@ export const ExpenseDashboard: React.FC = () => {
                 />
               )}
 
-              {/* Quick Actions Grid */}
+              {/* Quick Actions Grid / Horizontal Scroll */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Quick Actions</Text>
-                <View style={styles.quickActions}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.quickActionsScroll}
+                  style={styles.quickActionsContainer}
+                >
                   {QUICK_ACTIONS.map(item => (
                     <CategoryItem
                       key={item.id}
@@ -356,7 +371,7 @@ export const ExpenseDashboard: React.FC = () => {
                       onPress={handleQuickAction}
                     />
                   ))}
-                </View>
+                </ScrollView>
               </View>
 
               {/* Spending Overview Section */}
@@ -439,11 +454,14 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.h2,
     color: COLORS.navy,
   },
-  quickActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+  quickActionsContainer: {
+    marginHorizontal: -SPACING.screenPaddingHorizontal,
     marginTop: moderateScale(14),
+  },
+  quickActionsScroll: {
+    paddingHorizontal: SPACING.screenPaddingHorizontal,
+    gap: moderateScale(12),
+    alignItems: 'flex-start',
   },
   recentSection: {
     marginTop: moderateScale(14)

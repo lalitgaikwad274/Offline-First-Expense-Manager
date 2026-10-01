@@ -245,13 +245,13 @@ export const AnalyticsScreen: React.FC = memo(() => {
     return { currentExpenses: curList, previousExpenses: prevList };
   }, [expenses, period]);
 
-  // 2. Total spending calculations
+  // 2. Total spending calculations (net of credit settlements)
   const totalSpending = useMemo(() => {
-    return currentExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    return Math.max(0, currentExpenses.reduce((sum, item) => sum + (item.category === 'Credit' ? -Number(item.amount) : Number(item.amount) || 0), 0));
   }, [currentExpenses]);
 
   const prevTotalSpending = useMemo(() => {
-    return previousExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    return Math.max(0, previousExpenses.reduce((sum, item) => sum + (item.category === 'Credit' ? -Number(item.amount) : Number(item.amount) || 0), 0));
   }, [previousExpenses]);
 
   const { percentageChangeText, isDecrease, vsText } = useMemo(() => {
@@ -435,7 +435,7 @@ export const AnalyticsScreen: React.FC = memo(() => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#EBF9F7" />
+      <StatusBar barStyle="dark-content" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
