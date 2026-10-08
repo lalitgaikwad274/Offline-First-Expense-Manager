@@ -314,6 +314,7 @@ const skeletonStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(219, 237, 240, 0.8)',
     ...SHADOWS.soft,
+    marginBottom: moderateScale(20)
   },
   statCol: {
     flex: 1,
@@ -374,6 +375,7 @@ const skeletonStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(219, 237, 240, 0.8)',
     ...SHADOWS.soft,
+    marginTop: moderateScale(16),
   },
   recentItemRow: {
     flexDirection: 'row',

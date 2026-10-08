@@ -127,31 +127,6 @@ export const ExpenseDashboard: React.FC = () => {
 
   const isLoading = isDataLoading || reduxIsLoading;
 
-  // const handleLogoutRequest = useCallback(() => {
-  //   setIsDrawerOpen(false);
-  //   setTimeout(() => {
-  //     Alert.alert(
-  //       'Log Out',
-  //       'Are you sure you want to log out of Expensio?',
-  //       [
-  //         { text: 'Cancel', style: 'cancel' },
-  //         {
-  //           text: 'Log Out',
-  //           style: 'destructive',
-  //           onPress: async () => {
-  //             try {
-  //               const auth = getAuth();
-  //               await signOut(auth);
-  //             } catch (error: any) {
-  //               Alert.alert('Error', error?.message || 'Failed to log out');
-  //             }
-  //           },
-  //         },
-  //       ]
-  //     );
-  //   }, Platform.OS === 'android' ? 200 : 50);
-  // }, []);
-
   // Compute financial metrics via Redux state
   const totalExpenses = useMemo(() => {
     return Math.max(0, expenses.reduce((sum, item) => sum + (item.category === 'Credit' ? -item.amount : item.amount), 0));
@@ -378,46 +353,49 @@ export const ExpenseDashboard: React.FC = () => {
               <SpendingOverviewCard isLoading={isLoading} />
 
               {/* Recent Transactions Unified Card Section */}
-              <View style={styles.recentSection}>
-                <View style={styles.recentHeader}>
-                  <Text style={styles.sectionTitle}>Recent Expenses</Text>
-                  <Pressable
-                    hitSlop={8}
-                    onPress={() => navigation.navigate(SCREEN_NAMES.TRANSACTIONS)}
-                  >
-                    <Text style={styles.seeAll}>See All</Text>
-                  </Pressable>
-                </View>
+             
 
                 {isLoading ? (
                   <RecentExpensesSkeleton />
                 ) : (
-                  <View style={styles.recentUnifiedCard}>
-                    {recentExpenses.length === 0 ? (
-                      <View style={styles.emptyRecent}>
-                        <Receipt
-                          size={moderateScale(32)}
-                          color={COLORS.gray}
-                          strokeWidth={1.8}
-                        />
-                        <Text style={styles.emptyRecentText}>
-                          No recent transactions recorded
-                        </Text>
-                      </View>
-                    ) : (
-                      recentExpenses.map((item, index) => (
-                        <ExpenseCard
-                          key={item.id}
-                          item={item}
-                          variant="row"
-                          isLast={index === recentExpenses.length - 1}
-                          onPress={handleExpensePress}
-                        />
-                      ))
-                    )}
+                  <View style={styles.recentSection}>
+
+                    <View style={styles.recentHeader}>
+                      <Text style={styles.sectionTitle}>Recent Expenses</Text>
+                      <Pressable
+                        hitSlop={8}
+                        onPress={() => navigation.navigate(SCREEN_NAMES.TRANSACTIONS)}
+                      >
+                        <Text style={styles.seeAll}>See All</Text>
+                      </Pressable>
+                    </View>
+                    <View style={styles.recentUnifiedCard}>
+                      {recentExpenses.length === 0 ? (
+                        <View style={styles.emptyRecent}>
+                          <Receipt
+                            size={moderateScale(32)}
+                            color={COLORS.gray}
+                            strokeWidth={1.8}
+                          />
+                          <Text style={styles.emptyRecentText}>
+                            No recent transactions recorded
+                          </Text>
+                        </View>
+                      ) : (
+                        recentExpenses.map((item, index) => (
+                          <ExpenseCard
+                            key={item.id}
+                            item={item}
+                            variant="row"
+                            isLast={index === recentExpenses.length - 1}
+                            onPress={handleExpensePress}
+                          />
+                        ))
+                      )}
+                    </View>
+
                   </View>
-                )}
-              </View>
+               )}
             </>
           }
         />
@@ -448,7 +426,7 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.screenPaddingVertical,
   },
   section: {
-    marginBottom: SPACING.lg,
+    // marginBottom: SPACING.lg,
   },
   sectionTitle: {
     ...TYPOGRAPHY.h2,
