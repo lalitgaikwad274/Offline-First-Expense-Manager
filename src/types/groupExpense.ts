@@ -6,7 +6,7 @@ export interface GroupMember {
   phone?: string;
   email?: string;
   avatar?: string;
-  initials: string;
+  initials?: string;
   color?: string;
   isCurrentUser?: boolean;
   isAdmin?: boolean;
@@ -19,19 +19,50 @@ export interface ExpenseParticipant {
   shares?: number;
 }
 
+export interface GroupExpenseSplitItem {
+  member_id: number | string;
+  amount: number;
+  percentage: number;
+  shares: number;
+}
+
+export interface CreateGroupExpensePayload {
+  group_id: number | string;
+  description: string;
+  amount: number;
+  paid_by: number | string;
+  category_id: number;
+  category_name: string;
+  split_type: SplitType;
+  split_members: (number | string)[];
+  splits: GroupExpenseSplitItem[];
+  expense_date: string;
+  notes?: string;
+}
+
 export interface GroupExpense {
-  id: string;
+  id?: string;
   groupId: string;
+  group_id?: number | string;
   description: string;
   amount: number;
   paidBy: string; // member userId
+  paid_by?: number | string;
+  payer_name?: string;
   splitType: SplitType;
+  split_type?: SplitType;
   participants: ExpenseParticipant[];
+  splits?: GroupExpenseSplitItem[];
   category: string;
+  category_id?: number;
+  category_name?: string;
   date: string;
+  expense_date?: string;
   notes?: string;
   createdAt: string;
+  created_at?: string;
   updatedAt?: string;
+  updated_at?: string;
 }
 
 export type PaymentMethod = 'Cash' | 'UPI' | 'Bank transfer' | 'Other';

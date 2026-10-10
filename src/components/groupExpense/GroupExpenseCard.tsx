@@ -66,16 +66,20 @@ export const GroupExpenseCard = memo(({
   onPress,
 }: GroupExpenseCardProps) => {
   const memberMap = new Map<string, GroupMember>();
-  members.forEach((m) => memberMap.set(m.id, m));
+  members.forEach((m) => memberMap.set(String(m.id), m));
 
-  const payer = memberMap.get(expense.paidBy);
-  const isPayerMe = expense.paidBy === currentUserId || payer?.isCurrentUser;
-  const payerName = isPayerMe ? 'You' : payer?.name?.split(' ')[0] || 'Member';
+  const payerId = String(expense.paidBy || expense.paid_by || '');
+  const payer = memberMap.get(payerId);
+  const isPayerMe = payerId === String(currentUserId) || payer?.isCurrentUser;
+  const payerName = isPayerMe ? 'You' : payer?.name?.split(' ')[0] || expense.payer_name || 'Member';
 
-  const participantCount = expense.participants?.length || 0;
-  const myParticipant = expense.participants?.find((p) => p.userId === currentUserId || memberMap.get(p.userId)?.isCurrentUser);
+  const participants = expense.participants || [];
+  const participantCount = participants.length;
+  const myParticipant = participants.find((p) => String(p.userId) === String(currentUserId) || memberMap.get(String(p.userId))?.isCurrentUser);
 
-  const { icon: CategoryIcon, bg: iconBg, color: iconColor } = getCategoryIcon(expense.category || expense.description);
+  const { icon: CategoryIcon, bg: iconBg, color: iconColor } = getCategoryIcon(expense.category || expense.category_name || expense.description);
+
+  const expenseAmount = typeof expense.amount === 'number' ? expense.amount : parseFloat(expense.amount) || 0;
 
   // Compute what current user gets back or owes for this specific expense
   let badgeType: 'getBack' | 'owe' | 'settled' | 'none' = 'none';
@@ -83,8 +87,8 @@ export const GroupExpenseCard = memo(({
 
   if (isPayerMe) {
     // I paid total, other participants owe me: (total - myShare)
-    const myShare = myParticipant ? myParticipant.amount : 0;
-    const othersOwe = Number((expense.amount - myShare).toFixed(2));
+    const myShare = myParticipant ? (typeof myParticipant.amount === 'number' ? myParticipant.amount : parseFloat(myParticipant.amount) || 0) : 0;
+    const othersOwe = Number((expenseAmount - myShare).toFixed(2));
     if (othersOwe > 0.01) {
       badgeType = 'getBack';
       badgeAmount = othersOwe;
@@ -93,13 +97,14 @@ export const GroupExpenseCard = memo(({
     }
   } else if (myParticipant) {
     // Someone else paid, I am participant: I owe myShare
-    if (myParticipant.amount > 0.01) {
+    const myShare = typeof myParticipant.amount === 'number' ? myParticipant.amount : parseFloat(myParticipant.amount) || 0;
+    if (myShare > 0.01) {
       badgeType = 'owe';
-      badgeAmount = myParticipant.amount;
+      badgeAmount = myShare;
     }
   }
 
-  const timeString = formatExpenseTime(expense.date);
+  const timeString = formatExpenseTime(expense.date || expense.expense_date || expense.createdAt);
 
   return (
     <Pressable
@@ -109,7 +114,7 @@ export const GroupExpenseCard = memo(({
         pressed && styles.pressed,
       ]}
       accessibilityRole="button"
-      accessibilityLabel={`${expense.description}, ₹${expense.amount}`}
+      accessibilityLabel={`${expense.description}, ₹${expenseAmount}`}
     >
       <View style={styles.leftGroup}>
         <View style={[styles.iconContainer, { backgroundColor: iconBg }]}>
@@ -133,7 +138,7 @@ export const GroupExpenseCard = memo(({
 
       <View style={styles.rightGroup}>
         <Text style={styles.totalAmount}>
-          ₹{expense.amount.toLocaleString('en-IN')}
+          ₹{expenseAmount.toLocaleString('en-IN')}
         </Text>
 
         {badgeType === 'getBack' && (

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   FlatList,
   Platform,
@@ -13,13 +13,14 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Plus, Search, Users, X } from 'lucide-react-native';
-import { useAppSelector } from '../../store';
+import { useAppDispatch, useAppSelector } from '../../store';
 import { getGroups } from '../../store/groupExpenseSlice';
 import { Group } from '../../types/groupExpense';
 import { COLORS, SHADOWS, SPACING, moderateScale } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
 import GroupCard from '../../components/groupExpense/GroupCard';
 import { calculateBalances } from '../../utils/groupExpense/calculateBalances';
+import { getAllExpenses, getAllGroups } from '../../store/api';
 
 export const GroupExpensesScreen = () => {
   const navigation = useNavigation<any>();
@@ -32,7 +33,13 @@ export const GroupExpensesScreen = () => {
   const expenses = useAppSelector((state) => state.groupExpense.expenses);
   const settlements = useAppSelector((state) => state.groupExpense.settlements);
   const currentUser = useAppSelector((state) => state.groupExpense.currentUser);
+  const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    dispatch(getAllExpenses())
+    dispatch(getAllGroups());
+  }, []);
+  console.log("###### groupexpensescren ", groups)
   // Filter groups by search query
   const filteredGroups = useMemo(() => {
     if (!searchQuery.trim()) return groups;
@@ -120,13 +127,17 @@ export const GroupExpensesScreen = () => {
           </>
         }
         renderItem={({ item }) => {
-          const groupExpenses = expenses.filter((e) => e.groupId === item.id);
-          const groupSettlements = settlements.filter((s) => s.groupId === item.id);
+          const groupExpenses = expenses.filter(
+            (e) => String(e.groupId || (e as any).group_id) === String(item.id)
+          );
+          const groupSettlements = settlements.filter(
+            (s) => String(s.groupId) === String(item.id)
+          );
           const balanceCalc = calculateBalances(
             item,
             groupExpenses,
             groupSettlements,
-            currentUser.id
+            currentUser?.id
           );
 
           return (

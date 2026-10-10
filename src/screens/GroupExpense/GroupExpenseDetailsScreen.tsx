@@ -32,6 +32,7 @@ import {
 } from '../../store/groupExpenseSlice';
 import { GroupMember } from '../../types/groupExpense';
 import { COLORS, SHADOWS, SPACING, moderateScale } from '../../utils/constants';
+import { deleteGroupExpenseApi } from '../../store/api';
 
 const formatDateFull = (dateStr: string) => {
   try {
@@ -74,30 +75,46 @@ export const GroupExpenseDetailsScreen = () => {
   }
 
   const memberMap = new Map<string, GroupMember>();
-  group.members.forEach((m) => memberMap.set(m.id, m));
+  group?.members?.forEach((m) => memberMap.set(String(m.id), m));
+  const payerId = String(expense.paidBy || expense.paid_by || '');
+  const payer = memberMap.get(payerId);
+  const isPayerMe = payerId === String(currentUser?.id) || payer?.isCurrentUser;
 
-  const payer = memberMap.get(expense.paidBy);
-  const isPayerMe = expense.paidBy === currentUser.id || payer?.isCurrentUser;
+  const participantsList = Array.isArray(expense?.participants) && expense.participants.length > 0
+    ? expense.participants
+    : Array.isArray(expense?.splits)
+    ? expense.splits.map((s: any) => ({
+        userId: String(s.member_id ?? s.userId ?? ''),
+        amount: typeof s.amount === 'number' ? s.amount : parseFloat(s.amount) || 0,
+        member_name: s.member_name,
+        percentage: s.percentage,
+        shares: s.shares,
+      }))
+    : [];
 
-  const myParticipant = expense.participants.find(
-    (p) => p.userId === currentUser.id || memberMap.get(p.userId)?.isCurrentUser
+  const myParticipant = participantsList.find(
+    (p: any) => String(p.userId) === String(currentUser?.id) || memberMap.get(String(p.userId))?.isCurrentUser
   );
 
+  const expenseAmount = typeof expense.amount === 'number' ? expense.amount : parseFloat(expense.amount) || 0;
   let impactLabel = '';
   let impactAmount = 0;
   let impactType: 'getBack' | 'owe' | 'none' = 'none';
 
   if (isPayerMe) {
-    const myShare = myParticipant ? myParticipant.amount : 0;
-    impactAmount = Number((expense.amount - myShare).toFixed(2));
+    const myShare = myParticipant ? (typeof myParticipant.amount === 'number' ? myParticipant.amount : parseFloat(myParticipant.amount) || 0) : 0;
+    impactAmount = Number((expenseAmount - myShare).toFixed(2));
     if (impactAmount > 0) {
       impactLabel = 'You get back';
       impactType = 'getBack';
     }
-  } else if (myParticipant && myParticipant.amount > 0) {
-    impactAmount = myParticipant.amount;
-    impactLabel = 'You owe';
-    impactType = 'owe';
+  } else if (myParticipant) {
+    const myShare = typeof myParticipant.amount === 'number' ? myParticipant.amount : parseFloat(myParticipant.amount) || 0;
+    if (myShare > 0) {
+      impactAmount = myShare;
+      impactLabel = 'You owe';
+      impactType = 'owe';
+    }
   }
 
   const handleDelete = () => {
@@ -110,15 +127,17 @@ export const GroupExpenseDetailsScreen = () => {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            dispatch(deleteGroupExpense(expense.id));
-            dispatch(deleteExpense(expense.id));
+                console.log("#####!!! expense", expense)
+
+            dispatch(deleteGroupExpenseApi(groupId, expenseId));
+            // dispatch(deleteExpense(expense.id));
             navigation.goBack();
           },
         },
       ]
     );
   };
-
+console.log("######$#$#$ expense", expense)
   return (
     <View style={[styles.safeArea, { paddingTop: topInset }]}>
       <StatusBar barStyle="dark-content" />
@@ -222,7 +241,7 @@ export const GroupExpenseDetailsScreen = () => {
         {/* Split Details Breakdown */}
         <View style={styles.sectionCard}>
           <Text style={styles.sectionHeading}>
-            Split ({expense.participants.length} people ·{' '}
+            Split ({participantsList.length} people ·{' '}
             {expense.splitType === 'equal'
               ? 'Equal'
               : expense.splitType === 'exact'
@@ -233,12 +252,12 @@ export const GroupExpenseDetailsScreen = () => {
             )
           </Text>
 
-          {expense.participants.map((p) => {
-            const member = memberMap.get(p.userId);
-            const isMe = member?.isCurrentUser || p.userId === currentUser.id;
-
+          {participantsList.map((p: any, idx: number) => {
+            const member = memberMap.get(String(p.userId));
+            const isMe = String(p.userId) === String(currentUser?.id) || member?.isCurrentUser;
+            const pAmount = typeof p.amount === 'number' ? p.amount : parseFloat(p.amount) || 0;
             return (
-              <View key={p.userId} style={styles.participantRow}>
+              <View key={p.userId || idx} style={styles.participantRow}>
                 <View style={styles.participantLeft}>
                   <View
                     style={[
@@ -247,16 +266,16 @@ export const GroupExpenseDetailsScreen = () => {
                     ]}
                   >
                     <Text style={styles.miniAvatarText}>
-                      {member?.initials || 'U'}
+                      {(p?.member_name || member?.name || 'U').slice(0, 2).toUpperCase()}
                     </Text>
                   </View>
                   <Text style={styles.participantName}>
-                    {member?.name || 'Member'} {isMe ? '(You)' : ''}
+                    {p?.member_name || member?.name || 'Member'} {isMe ? '(You)' : ''}
                   </Text>
                 </View>
 
                 <Text style={styles.participantAmount}>
-                  ₹{p.amount.toLocaleString('en-IN')}
+                  ₹{pAmount.toLocaleString('en-IN')}
                 </Text>
               </View>
             );

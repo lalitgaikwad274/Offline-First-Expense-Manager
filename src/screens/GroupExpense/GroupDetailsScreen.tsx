@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   FlatList,
   Modal,
@@ -32,8 +33,10 @@ import {
   getGroupById,
   getGroupExpenses,
   removeGroupMember,
+  setGroupExpenses,
 } from '../../store/groupExpenseSlice';
-import { GroupExpense, GroupMember, SimplifiedDebt } from '../../types/groupExpense';
+import { Group, GroupExpense, GroupMember, SimplifiedDebt } from '../../types/groupExpense';
+import { formatGroupExpense } from '../../utils/helpers';
 import { CONTACTS_POOL } from '../../utils/groupExpense/mockData';
 import { COLORS, SHADOWS, SPACING, moderateScale } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
@@ -41,6 +44,9 @@ import GroupBalanceCard from '../../components/groupExpense/GroupBalanceCard';
 import GroupExpenseCard from '../../components/groupExpense/GroupExpenseCard';
 import { MemberBalanceRow, SimplifiedDebtCard } from '../../components/groupExpense/SettlementCard';
 import MemberRow from '../../components/groupExpense/MemberRow';
+import { serverCall } from '../../services/api';
+import { ENDPOINTS } from '../../utils/ApiConstants';
+import { getGroupByIdApi } from '../../store/api';
 
 export const GroupDetailsScreen = () => {
   const navigation = useNavigation<any>();
@@ -51,21 +57,94 @@ export const GroupDetailsScreen = () => {
 
   const groupId = route.params?.groupId;
 
-  const group = useAppSelector(getGroupById(groupId));
+  useEffect(() => {
+    if (!groupId) {
+      Alert.alert('Error', 'Group ID is missing. Please go back and try again.');
+      navigation.goBack();
+    }
+    else{
+      dispatch(getGroupByIdApi(groupId));
+    }
+  }, [groupId]);
+
+  const groupData = useAppSelector(getGroupById(groupId));
+  
   const expenses = useAppSelector(getGroupExpenses(groupId));
   const balanceInfo = useAppSelector(getGroupBalances(groupId));
   const currentUser = useAppSelector((state) => state.groupExpense.currentUser);
-
+  const [group, setGroup] = useState<Group | null>(groupData || null);
+  const [isLoading, setIsLoading] = useState(!groupData);
   const [activeTab, setActiveTab] = useState<'Expenses' | 'Balances' | 'Members'>('Expenses');
 
   // Add Member Modal State
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberPhone, setNewMemberPhone] = useState('');
+  console.log("####groupId : ", groupId);
 
-  if (!group) {
+  const getGroupDeatils = async () => {
+    try {
+      setIsLoading(true);
+      const response = await serverCall(ENDPOINTS.GET_GROUP_DETAILS(groupId), "GET");
+      console.log("#######response ", response);
+      if (response?.data && Object.keys(response?.data).length > 0) {
+        setGroup(response.data);
+        if (Array.isArray(response.data.expenses) && response.data.expenses.length > 0) {
+          const formattedExpenses = response.data.expenses.map(formatGroupExpense);
+          dispatch(setGroupExpenses(formattedExpenses));
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (groupData) {
+      setGroup(groupData);
+      setIsLoading(false);
+    } else if (groupId) {
+      getGroupDeatils();
+    }
+  }, [groupData, groupId]);
+
+  // Show loader while fetching or before group data is set
+  if (isLoading) {
+    return (
+      <View style={[styles.safeArea, { paddingTop: topInset }]}>
+        <StatusBar barStyle="dark-content" />
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            hitSlop={12}
+            style={styles.headerButton}
+          >
+            <ArrowLeft size={moderateScale(24)} color={COLORS.navy} strokeWidth={2.4} />
+          </Pressable>
+
+          <View style={styles.headerTitleGroup}>
+            <Text style={styles.headerTitle} numberOfLines={1}>
+              Loading...
+            </Text>
+          </View>
+
+          <View style={{ width: moderateScale(40) }} />
+        </View>
+
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Loading group details...</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (!group || !group.name) {
     return (
       <View style={[styles.safeArea, { paddingTop: topInset, justifyContent: 'center', alignItems: 'center' }]}>
+        <StatusBar barStyle="dark-content" />
         <Text style={styles.errorText}>Group not found</Text>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backHomeBtn}>
           <Text style={styles.backHomeBtnText}>Go Back</Text>
@@ -164,6 +243,8 @@ export const GroupDetailsScreen = () => {
     setShowAddMemberModal(false);
   };
 
+  const membersList = Array.isArray(group?.members) ? group.members : [];
+  console.log("####### membersList",membersList)
   return (
     <View style={[styles.safeArea, { paddingTop: topInset }]}>
       <StatusBar barStyle="dark-content" />
@@ -183,7 +264,7 @@ export const GroupDetailsScreen = () => {
             {group.name}
           </Text>
           <Text style={styles.headerSubtitle}>
-            {group.members.length} {group.members.length === 1 ? 'member' : 'members'}
+            {membersList.length} {membersList.length === 1 ? 'member' : 'members'}
           </Text>
         </View>
 
@@ -261,7 +342,7 @@ export const GroupDetailsScreen = () => {
                 <GroupExpenseCard
                   key={expense.id}
                   expense={expense}
-                  members={group.members}
+                  members={membersList}
                   currentUserId={currentUser.id}
                   onPress={handleExpensePress}
                 />
@@ -323,7 +404,7 @@ export const GroupDetailsScreen = () => {
               </Pressable>
             </View>
 
-            {group.members.map((member) => (
+            {membersList.map((member) => (
               <MemberRow
                 key={member.id}
                 member={member}
@@ -652,6 +733,18 @@ const styles = StyleSheet.create({
   backHomeBtnText: {
     color: COLORS.white,
     fontWeight: '700',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: moderateScale(60),
+  },
+  loadingText: {
+    fontSize: moderateScale(15),
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+    marginTop: moderateScale(14),
   },
 });
 

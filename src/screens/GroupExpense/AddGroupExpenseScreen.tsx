@@ -33,6 +33,7 @@ import { useAppDispatch, useAppSelector } from '../../store';
 import { addExpense } from '../../store/expenseSlice';
 import { addGroupExpense, getGroupById } from '../../store/groupExpenseSlice';
 import {
+  CreateGroupExpensePayload,
   ExpenseParticipant,
   GroupExpense,
   GroupMember,
@@ -47,6 +48,7 @@ import { calculateEqualSplit } from '../../utils/groupExpense/calculateEqualSpli
 import { calculatePercentageSplit } from '../../utils/groupExpense/calculatePercentageSplit';
 import { calculateSharesSplit } from '../../utils/groupExpense/calculateSharesSplit';
 import { validateSplit } from '../../utils/groupExpense/validateSplit';
+import { addGroupExpenseApi } from '../../store/api';
 
 const CATEGORIES = [
   'Food & Dining',
@@ -225,38 +227,74 @@ export const AddGroupExpenseScreen = () => {
       Alert.alert('Split Mismatch', splitValidation.errorMessage || 'Please check split amounts');
       return;
     }
+    // const newExpense: GroupExpense = {
+    //   id: `exp_${Date.now()}`,
+    //   groupId: group.id,
+    //   description: description.trim(),
+    //   amount: totalAmount,
+    //   paidBy: paidByUserId,
+    //   splitType,
+    //   participants: computedParticipants,
+    //   category,
+    //   date: new Date().toISOString(),
+    //   createdAt: new Date().toISOString(),
+    // };
 
-    const newExpense: GroupExpense = {
-      id: `exp_${Date.now()}`,
-      groupId: group.id,
+    const categoryIndex = CATEGORIES.indexOf(category);
+    const categoryId = categoryIndex >= 0 ? categoryIndex + 1 : 1;
+
+    const payload: CreateGroupExpensePayload = {
+      group_id: !isNaN(Number(group.id)) ? Number(group.id) : group.id,
       description: description.trim(),
       amount: totalAmount,
-      paidBy: paidByUserId,
-      splitType,
-      participants: computedParticipants,
-      category,
-      date: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
+      paid_by: !isNaN(Number(paidByUserId)) ? Number(paidByUserId) : paidByUserId,
+      category_id: categoryId,
+      category_name: category,
+      split_type: splitType,
+      split_members: selectedParticipants.map((id) =>
+        !isNaN(Number(id)) ? Number(id) : id
+      ),
+      splits: computedParticipants.map((p) => {
+        const memberId = !isNaN(Number(p.userId)) ? Number(p.userId) : p.userId;
+        const pct =
+          p.percentage ??
+          (totalAmount > 0
+            ? Number(((p.amount / totalAmount) * 100).toFixed(2))
+            : 0);
+        const sh =
+          p.shares ??
+          (splitType === 'shares'
+            ? parseFloat(shares[p.userId] || '1') || 1
+            : 1);
+        return {
+          member_id: memberId,
+          amount: p.amount,
+          percentage: pct,
+          shares: sh,
+        };
+      }),
+      expense_date: new Date().toISOString(),
     };
 
-    dispatch(addGroupExpense(newExpense));
+    // dispatch(addGroupExpense(newExpense));
+    dispatch(addGroupExpenseApi(payload));
 
     // When the user pays for the group expense, add the whole amount to parent expenses
-    const isPayerMe = paidByUserId === currentUser.id || payerMember?.isCurrentUser;
-    if (isPayerMe) {
-      dispatch(
-        addExpense({
-          id: newExpense.id,
-          title: description.trim(),
-          category: (category as ExpenseCategory) || 'Other',
-          amount: totalAmount,
-          date: formatTransactionDate(new Date()),
-          notes: `Group expense for ${group.name} (${computedParticipants.length} people)`,
-          color: getCategoryColor(category),
-          synced: true,
-        })
-      );
-    }
+    // const isPayerMe = paidByUserId === currentUser.id || payerMember?.isCurrentUser;
+    // if (isPayerMe) {
+    //   dispatch(
+    //     addExpense({
+    //       id: newExpense.id,
+    //       title: description.trim(),
+    //       category: (category as ExpenseCategory) || 'Other',
+    //       amount: totalAmount,
+    //       date: formatTransactionDate(new Date()),
+    //       notes: `Group expense for ${group.name} (${computedParticipants.length} people)`,
+    //       color: getCategoryColor(category),
+    //       synced: true,
+    //     })
+    //   );
+    // }
 
     navigation.goBack();
   };
@@ -318,6 +356,47 @@ export const AddGroupExpenseScreen = () => {
               onChangeText={setAmountStr}
             />
           </View>
+
+          <Text style={[styles.fieldLabel, { marginTop: moderateScale(16) }]}>Category</Text>
+          <Pressable
+            onPress={() => setShowCategoryPicker(true)}
+            style={styles.dropdownSelector}
+          >
+            <View style={styles.categoryLeft}>
+              <Tag size={moderateScale(18)} color={COLORS.primary} />
+              <Text style={styles.categoryText}>{category}</Text>
+            </View>
+            <ChevronRight size={moderateScale(18)} color={COLORS.textSecondary} />
+          </Pressable>
+        </View>
+
+        {/* Split Type Selector */}
+        <View style={styles.card}>
+          <Text style={styles.fieldLabel}>Split type</Text>
+          <Pressable
+            onPress={() => setShowSplitTypeModal(true)}
+            style={styles.splitTypeButton}
+          >
+            <View style={styles.splitTypeLeft}>
+              <View style={styles.splitTypeIconCircle}>
+                <Utensils size={moderateScale(18)} color={COLORS.primary} />
+              </View>
+              <View>
+                <Text style={styles.splitTypeTitle}>
+                  {splitType === 'equal'
+                    ? 'Split equally'
+                    : splitType === 'exact'
+                    ? 'Exact amounts'
+                    : splitType === 'percentage'
+                    ? 'Percentages'
+                    : 'Shares'}
+                </Text>
+                <Text style={styles.splitTypeSubtitle}>{perPersonSubtitle}</Text>
+              </View>
+            </View>
+
+            <ChevronRight size={moderateScale(18)} color={COLORS.textSecondary} />
+          </Pressable>
         </View>
 
         {/* Paid By Selector */}
@@ -370,49 +449,6 @@ export const AddGroupExpenseScreen = () => {
           ))}
         </View>
 
-        {/* Split Type Selector */}
-        <View style={styles.card}>
-          <Text style={styles.fieldLabel}>Split type</Text>
-          <Pressable
-            onPress={() => setShowSplitTypeModal(true)}
-            style={styles.splitTypeButton}
-          >
-            <View style={styles.splitTypeLeft}>
-              <View style={styles.splitTypeIconCircle}>
-                <Utensils size={moderateScale(18)} color={COLORS.primary} />
-              </View>
-              <View>
-                <Text style={styles.splitTypeTitle}>
-                  {splitType === 'equal'
-                    ? 'Split equally'
-                    : splitType === 'exact'
-                    ? 'Exact amounts'
-                    : splitType === 'percentage'
-                    ? 'Percentages'
-                    : 'Shares'}
-                </Text>
-                <Text style={styles.splitTypeSubtitle}>{perPersonSubtitle}</Text>
-              </View>
-            </View>
-
-            <ChevronRight size={moderateScale(18)} color={COLORS.textSecondary} />
-          </Pressable>
-        </View>
-
-        {/* Category Selector */}
-        <View style={styles.card}>
-          <Text style={styles.fieldLabel}>Category</Text>
-          <Pressable
-            onPress={() => setShowCategoryPicker(true)}
-            style={styles.dropdownSelector}
-          >
-            <View style={styles.categoryLeft}>
-              <Tag size={moderateScale(18)} color={COLORS.primary} />
-              <Text style={styles.categoryText}>{category}</Text>
-            </View>
-            <ChevronRight size={moderateScale(18)} color={COLORS.textSecondary} />
-          </Pressable>
-        </View>
       </ScrollView>
 
       {/* Bottom CTA Button */}

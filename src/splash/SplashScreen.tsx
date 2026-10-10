@@ -27,7 +27,7 @@ const SplashScreen = ({onFinish}: SplashScreenProps) => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <LottieView
-        source={require('../Assets/lottie/expense_manager_splash.json')}
+        source={require('../Assets/lottie/expensio_splash_5_fullscreen.json')}
         style={styles.animation}
         autoPlay
         loop={false}
@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
   },
 
   animation: {
-    width: width,
-    height: height,
+    width: '100%',
+    height: '100%',
   },
 
   textContainer: {

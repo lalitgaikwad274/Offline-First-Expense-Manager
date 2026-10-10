@@ -26,12 +26,12 @@ import {
 } from 'lucide-react-native';
 import { useAppDispatch, useAppSelector } from '../../store';
 import {
-  deleteGroup,
   getGroupById,
   updateGroup,
 } from '../../store/groupExpenseSlice';
 import { COLORS, SHADOWS, SPACING, moderateScale } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
+import { deleteGroup } from '../../store/api';
 
 export const GroupSettingsScreen = () => {
   const navigation = useNavigation<any>();
@@ -55,8 +55,8 @@ export const GroupSettingsScreen = () => {
       </View>
     );
   }
-
-  const isOwner = group.createdBy === currentUser.id;
+  console.log("### group.createdBy", group.createdBy)
+  const isOwner = true //group.createdBy === currentUser.id;
 
   const handleSaveInfo = () => {
     if (!name.trim()) {
@@ -95,7 +95,8 @@ export const GroupSettingsScreen = () => {
           text: 'Delete Group',
           style: 'destructive',
           onPress: () => {
-            dispatch(deleteGroup(group.id));
+            dispatch(deleteGroup(group.id))
+            // dispatch(deleteGroup(group.id));
             navigation.navigate(SCREEN_NAMES.GROUP_EXPENSES);
           },
         },

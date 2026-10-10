@@ -1,5 +1,6 @@
 import { APP_CONFIG } from './constants';
 import { Expense, ExpenseCategory } from '../types/expense';
+import { GroupExpense, ExpenseParticipant, SplitType } from '../types/groupExpense';
 
 /**
  * Format a number to currency with Indian Rupee (or configured) symbol
@@ -166,6 +167,62 @@ export const formatTransaction = (item: any, fallbackId?: string): Expense => {
     ...(item.notes ? { notes: item.notes } : {}),
     ...(item.bankName ? { bankName: item.bankName } : {}),
     ...(item.bankId ? { bankId: item.bankId } : {}),
+  };
+};
+
+/**
+ * Formats a raw group expense (e.g. from backend API response) into the standard GroupExpense format:
+ */
+export const formatGroupExpense = (raw: any): GroupExpense => {
+  if (!raw) {
+    return {} as GroupExpense;
+  }
+
+  const rawSplits = Array.isArray(raw?.splits) ? raw.splits : [];
+  const rawParticipants = Array.isArray(raw?.participants) ? raw.participants : [];
+
+  let participants: ExpenseParticipant[] = [];
+  if (rawSplits.length > 0) {
+    participants = rawSplits.map((s: any) => ({
+      userId: String(s.member_id ?? s.userId ?? ''),
+      amount: typeof s.amount === 'number' ? s.amount : parseFloat(s.amount) || 0,
+      percentage: s.percentage !== undefined ? parseFloat(s.percentage) || 0 : undefined,
+      shares: s.shares !== undefined ? parseFloat(s.shares) || 0 : undefined,
+    }));
+  } else if (rawParticipants.length > 0) {
+    participants = rawParticipants.map((p: any) => ({
+      userId: String(p.userId ?? p.member_id ?? ''),
+      amount: typeof p.amount === 'number' ? p.amount : parseFloat(p.amount) || 0,
+      percentage: p.percentage !== undefined ? parseFloat(p.percentage) || 0 : undefined,
+      shares: p.shares !== undefined ? parseFloat(p.shares) || 0 : undefined,
+    }));
+  }
+
+  const rawAmount = typeof raw.amount === 'number' ? raw.amount : parseFloat(raw.amount) || 0;
+
+  return {
+    id: String(raw.id || `exp_${Date.now()}`),
+    groupId: String(raw.group_id ?? raw.groupId ?? ''),
+    group_id: raw.group_id,
+    description: raw.description || '',
+    amount: rawAmount,
+    paidBy: String(raw.paid_by ?? raw.paidBy ?? ''),
+    paid_by: raw.paid_by,
+    payer_name: raw.payer_name,
+    splitType: (raw.split_type ?? raw.splitType ?? 'equal') as SplitType,
+    split_type: raw.split_type,
+    participants,
+    splits: raw.splits,
+    category: raw.category_name || raw.category || 'Other',
+    category_id: raw.category_id,
+    category_name: raw.category_name,
+    date: raw.expense_date || raw.date || raw.created_at || new Date().toISOString(),
+    expense_date: raw.expense_date,
+    notes: raw.notes ?? undefined,
+    createdAt: raw.created_at || raw.createdAt || new Date().toISOString(),
+    created_at: raw.created_at,
+    updatedAt: raw.updated_at || raw.updatedAt,
+    updated_at: raw.updated_at,
   };
 };
 

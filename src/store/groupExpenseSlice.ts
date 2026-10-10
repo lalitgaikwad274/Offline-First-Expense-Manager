@@ -25,10 +25,10 @@ export interface GroupExpenseState {
 }
 
 const initialState: GroupExpenseState = {
-  groups: INITIAL_GROUPS,
-  expenses: INITIAL_EXPENSES,
-  settlements: INITIAL_SETTLEMENTS,
-  currentUser: CURRENT_USER,
+  groups: [],
+  expenses: [],
+  settlements: [],
+  currentUser: {} as GroupMember,
   isLoading: false,
   error: null,
 };
@@ -49,12 +49,19 @@ export const groupExpenseSlice = createSlice({
 
     // Groups
     createGroup: (state, action: PayloadAction<Group>) => {
-      state.groups.unshift(action.payload);
-    },
-    updateGroup: (state, action: PayloadAction<Group>) => {
-      const idx = state.groups.findIndex((g) => g.id === action.payload.id);
+      const idx = state.groups.findIndex((g) => String(g.id) === String(action.payload.id));
       if (idx !== -1) {
         state.groups[idx] = action.payload;
+      } else {
+        state.groups.unshift(action.payload);
+      }
+    },
+    updateGroup: (state, action: PayloadAction<Group>) => {
+      const idx = state.groups.findIndex((g) => String(g.id) === String(action.payload.id));
+      if (idx !== -1) {
+        state.groups[idx] = action.payload;
+      } else {
+        state.groups.unshift(action.payload);
       }
     },
     deleteGroup: (state, action: PayloadAction<string>) => {
@@ -109,14 +116,52 @@ export const groupExpenseSlice = createSlice({
     },
 
     // Batch sets
-    setGroups: (state, action: PayloadAction<Group[]>) => {
-      state.groups = action.payload;
+    setGroups: (state, action: PayloadAction<any>) => {
+      const rawList = Array.isArray(action.payload)
+        ? action.payload
+        : Array.isArray(action.payload?.groups)
+        ? action.payload.groups
+        : Array.isArray(action.payload?.data)
+        ? action.payload.data
+        : null;
+
+      if (rawList) {
+        const seen = new Set<string>();
+        const uniqueGroups: Group[] = [];
+        for (const g of rawList) {
+          if (!g) continue;
+          const idStr = String(g.id);
+          if (!seen.has(idStr)) {
+            seen.add(idStr);
+            uniqueGroups.push(g);
+          }
+        }
+        state.groups = uniqueGroups;
+      } else if (action.payload && typeof action.payload === 'object' && action.payload.id) {
+        const singleGroup = action.payload as Group;
+        const exists = state.groups.findIndex((g) => String(g.id) === String(singleGroup.id));
+        if (exists >= 0) {
+          state.groups[exists] = singleGroup;
+        } else {
+          state.groups.unshift(singleGroup);
+        }
+      }
     },
     setGroupExpenses: (state, action: PayloadAction<GroupExpense[]>) => {
-      state.expenses = action.payload;
+      const newExpenses = Array.isArray(action.payload) ? action.payload : [];
+      if (newExpenses.length === 0) return;
+      const targetGroupId = newExpenses[0]?.groupId;
+      if (targetGroupId) {
+        state.expenses = [
+          ...newExpenses,
+          ...state.expenses.filter((e) => String(e.groupId) !== String(targetGroupId)),
+        ];
+      } else {
+        state.expenses = newExpenses;
+      }
     },
     setSettlements: (state, action: PayloadAction<GroupSettlement[]>) => {
-      state.settlements = action.payload;
+      state.settlements = Array.isArray(action.payload) ? action.payload : [];
     },
   },
 });
@@ -141,35 +186,67 @@ export const {
 } = groupExpenseSlice.actions;
 
 // Selectors
-export const getGroups = (state: RootState) => state.groupExpense.groups;
-export const getGroupById = (groupId: string) => (state: RootState) =>
-  state.groupExpense.groups.find((g) => g.id === groupId);
-export const getGroupExpenses = (groupId: string) => (state: RootState) =>
-  state.groupExpense.expenses.filter((e) => e.groupId === groupId);
-export const getGroupExpenseById = (expenseId: string) => (state: RootState) =>
-  state.groupExpense.expenses.find((e) => e.id === expenseId);
-export const getGroupMembers = (groupId: string) => (state: RootState) => {
-  const group = state.groupExpense.groups.find((g) => g.id === groupId);
-  return group ? group.members : [];
-};
-export const getGroupSettlements = (groupId: string) => (state: RootState) =>
-  state.groupExpense.settlements.filter((s) => s.groupId === groupId);
+export const getGroups = (state: RootState) =>
+  Array.isArray(state.groupExpense?.groups) ? state.groupExpense.groups : [];
 
-export const getGroupBalances = (groupId: string) => (state: RootState): GroupBalanceCalculation => {
-  const group = state.groupExpense.groups.find((g) => g.id === groupId);
-  if (!group) {
-    return {
-      totalExpense: 0,
-      netBalances: {},
-      myNetBalance: 0,
-      memberBalances: [],
-      pairwiseBalances: {},
-      simplifiedDebts: [],
-    };
-  }
-  const expenses = state.groupExpense.expenses.filter((e) => e.groupId === groupId);
-  const settlements = state.groupExpense.settlements.filter((s) => s.groupId === groupId);
-  const currentUserId = state.groupExpense.currentUser.id;
+export const getGroupById = (groupId: string | undefined | null) => (state: RootState) => {
+  const groups = state.groupExpense?.groups;
+  if (!Array.isArray(groups) || !groupId) return undefined;
+  return groups.find((g) => g && (g.id === groupId || String(g.id) === String(groupId)));
+};
+
+export const getGroupExpenses = (groupId: string | undefined | null) => (state: RootState) => {
+  const expenses = state.groupExpense?.expenses;
+  console.log("##### expenses", expenses, groupId);
+  if (!Array.isArray(expenses) || !groupId) return [];
+  return expenses.filter(
+    (e) =>
+      e &&
+      (String(e.groupId) === String(groupId) ||
+        String(e.group_id) === String(groupId))
+  );
+};
+
+export const getGroupExpenseById = (expenseId: string | undefined | null) => (state: RootState) => {
+  const expenses = state.groupExpense?.expenses;
+  if (!Array.isArray(expenses) || !expenseId) return undefined;
+  return expenses.find((e) => e && (e.id === expenseId || String(e.id) === String(expenseId)));
+};
+
+export const getGroupMembers = (groupId: string | undefined | null) => (state: RootState) => {
+  const groups = state.groupExpense?.groups;
+  if (!Array.isArray(groups) || !groupId) return [];
+  const group = groups.find((g) => g && (g.id === groupId || String(g.id) === String(groupId)));
+  return Array.isArray(group?.members) ? group.members : [];
+};
+
+export const getGroupSettlements = (groupId: string | undefined | null) => (state: RootState) => {
+  const settlements = state.groupExpense?.settlements;
+  if (!Array.isArray(settlements) || !groupId) return [];
+  return settlements.filter((s) => s && (s.groupId === groupId || String(s.groupId) === String(groupId)));
+};
+
+export const getGroupBalances = (groupId: string | undefined | null) => (state: RootState): GroupBalanceCalculation => {
+  const emptyResult: GroupBalanceCalculation = {
+    totalExpense: 0,
+    netBalances: {},
+    myNetBalance: 0,
+    memberBalances: [],
+    pairwiseBalances: {},
+    simplifiedDebts: [],
+  };
+  const groups = state.groupExpense?.groups;
+  if (!Array.isArray(groups) || !groupId) return emptyResult;
+  const group = groups.find((g) => g && (g.id === groupId || String(g.id) === String(groupId)));
+  if (!group) return emptyResult;
+
+  const expenses = Array.isArray(state.groupExpense?.expenses)
+    ? state.groupExpense.expenses.filter((e) => e && (e.groupId === groupId || String(e.groupId) === String(groupId)))
+    : [];
+  const settlements = Array.isArray(state.groupExpense?.settlements)
+    ? state.groupExpense.settlements.filter((s) => s && (s.groupId === groupId || String(s.groupId) === String(groupId)))
+    : [];
+  const currentUserId = state.groupExpense?.currentUser?.id || '';
 
   return calculateBalances(group, expenses, settlements, currentUserId);
 };

@@ -28,12 +28,13 @@ import {
   X,
 } from 'lucide-react-native';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { createGroup } from '../../store/groupExpenseSlice';
+// import { createGroup } from '../../store/groupExpenseSlice';
 import { Group, GroupMember } from '../../types/groupExpense';
 import { CONTACTS_POOL } from '../../utils/groupExpense/mockData';
 import { COLORS, SHADOWS, SPACING, moderateScale } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
 import SplitMemberRow from '../../components/groupExpense/SplitMemberRow';
+import { createGroup } from '../../store/api';
 
 const EMOJI_AVATARS = ['🌴', '🏠', '🍕', '💼', '✈️', '🎉', '🚗', '☕', '🏕️', '🎮', '🏖️', '🍔'];
 
@@ -143,21 +144,22 @@ export const CreateGroupScreen = () => {
     const selectedMembers = contacts.filter((c) =>
       selectedMemberIds.includes(c.id)
     );
-
+    const groupmemberArray = selectedMembers.map((member) => ({
+      name: member.name,
+      phoneNumber: member.phone,
+      role: 'member',
+    }));
     const newGroup: Group = {
-      id: `group_${Date.now()}`,
+      id: `${Date.now()}`,
       name: groupName.trim(),
       description: description.trim() || undefined,
-      avatarIcon: selectedEmoji,
-      currency: 'INR',
-      createdBy: currentUser.id,
-      createdAt: new Date().toISOString(),
-      members: selectedMembers,
-      simplifyDebts: true,
-      defaultSplit: 'equal',
+      icon: selectedEmoji,
+      members: groupmemberArray,
     };
 
-    dispatch(createGroup(newGroup));
+    console.log("####### newGroup", newGroup)
+    dispatch(createGroup(newGroup))
+    // dispatch(createGroup(newGroup));
     navigation.replace(SCREEN_NAMES.GROUP_DETAILS, { groupId: newGroup.id });
   };
 
