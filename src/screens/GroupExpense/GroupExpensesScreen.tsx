@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Platform,
   Pressable,
-  SafeAreaView,
+  RefreshControl,
   StatusBar,
   StyleSheet,
   Text,
@@ -21,6 +22,7 @@ import { SCREEN_NAMES } from '../../utils/screenNames';
 import GroupCard from '../../components/groupExpense/GroupCard';
 import { calculateBalances } from '../../utils/groupExpense/calculateBalances';
 import { getAllExpenses, getAllGroups } from '../../store/api';
+import { GroupListSkeleton } from '../../components/Shimmer';
 
 export const GroupExpensesScreen = () => {
   const navigation = useNavigation<any>();
@@ -28,25 +30,76 @@ export const GroupExpensesScreen = () => {
   const topInset = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : insets.top;
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const groups = useAppSelector(getGroups);
   const expenses = useAppSelector((state) => state.groupExpense.expenses);
   const settlements = useAppSelector((state) => state.groupExpense.settlements);
   const currentUser = useAppSelector((state) => state.groupExpense.currentUser);
+  const reduxLoading = useAppSelector(
+    (state) => state.groupExpense.isLoading || state.expense.isLoading
+  );
   const dispatch = useAppDispatch();
 
+  const loadData = useCallback(async () => {
+    try {
+      await Promise.all([
+        dispatch(getAllExpenses()),
+        dispatch(getAllGroups()),
+      ]);
+    } catch (error) {
+      console.error('Error fetching group expenses data:', error);
+    }
+  }, [dispatch]);
+
   useEffect(() => {
-    dispatch(getAllExpenses())
-    dispatch(getAllGroups());
-  }, []);
-  console.log("###### groupexpensescren ", groups)
+    let isMounted = true;
+    const fetchInitial = async () => {
+      setIsFetching(true);
+      await loadData();
+      if (isMounted) {
+        setIsFetching(false);
+      }
+    };
+    fetchInitial();
+    return () => {
+      isMounted = false;
+    };
+  }, [loadData]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  };
+
+  // Debounced search to provide a smooth loading state while filtering
+  useEffect(() => {
+    if (searchQuery.trim() !== debouncedSearchQuery.trim()) {
+      setIsSearching(true);
+      const timer = setTimeout(() => {
+        setDebouncedSearchQuery(searchQuery);
+        setIsSearching(false);
+      }, 250);
+      return () => clearTimeout(timer);
+    } else {
+      setIsSearching(false);
+    }
+  }, [searchQuery, debouncedSearchQuery]);
+
   // Filter groups by search query
   const filteredGroups = useMemo(() => {
-    if (!searchQuery.trim()) return groups;
+    const query = debouncedSearchQuery.trim().toLowerCase();
+    if (!query) return groups;
     return groups.filter((g) =>
-      g.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+      g.name.toLowerCase().includes(query)
     );
-  }, [groups, searchQuery]);
+  }, [groups, debouncedSearchQuery]);
+
+  const isLoading = isFetching || reduxLoading || isSearching;
 
   const handleGroupPress = (group: Group) => {
     navigation.navigate(SCREEN_NAMES.GROUP_DETAILS, { groupId: group.id });
@@ -86,10 +139,18 @@ export const GroupExpensesScreen = () => {
       </View>
 
       <FlatList
-        data={filteredGroups}
+        data={isLoading ? [] : filteredGroups}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[COLORS.primary]}
+            tintColor={COLORS.primary}
+          />
+        }
         ListHeaderComponent={
           <>
             {/* Search Bar */}
@@ -105,8 +166,13 @@ export const GroupExpensesScreen = () => {
                 placeholderTextColor={COLORS.textMuted}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
+                autoCorrect={false}
               />
-              {searchQuery.length > 0 && (
+              {isSearching ? (
+                <View style={styles.searchLoader}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                </View>
+              ) : searchQuery.length > 0 ? (
                 <Pressable
                   onPress={() => setSearchQuery('')}
                   hitSlop={8}
@@ -114,15 +180,21 @@ export const GroupExpensesScreen = () => {
                 >
                   <X size={moderateScale(16)} color={COLORS.textMuted} />
                 </Pressable>
-              )}
+              ) : null}
             </View>
 
             {/* Section Title */}
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>Your groups</Text>
-              <Text style={styles.groupCountBadge}>
-                {filteredGroups.length}
-              </Text>
+              {isLoading ? (
+                <View style={styles.loadingBadgeContainer}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                </View>
+              ) : (
+                <Text style={styles.groupCountBadge}>
+                  {filteredGroups.length}
+                </Text>
+              )}
             </View>
           </>
         }
@@ -150,32 +222,36 @@ export const GroupExpensesScreen = () => {
           );
         }}
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <View style={styles.emptyIconCircle}>
-              <Users
-                size={moderateScale(36)}
-                color={COLORS.primary}
-                strokeWidth={2}
-              />
+          isLoading ? (
+            <GroupListSkeleton count={3} />
+          ) : (
+            <View style={styles.emptyContainer}>
+              <View style={styles.emptyIconCircle}>
+                <Users
+                  size={moderateScale(36)}
+                  color={COLORS.primary}
+                  strokeWidth={2}
+                />
+              </View>
+              <Text style={styles.emptyTitle}>
+                {searchQuery ? 'No groups found' : 'No groups yet'}
+              </Text>
+              <Text style={styles.emptySubtitle}>
+                {searchQuery
+                  ? `No group matched "${searchQuery}"`
+                  : 'Create your first group to start sharing expenses with friends.'}
+              </Text>
+              {!searchQuery && (
+                <Pressable
+                  onPress={handleCreateGroup}
+                  style={styles.emptyButton}
+                >
+                  <Plus size={moderateScale(18)} color={COLORS.white} strokeWidth={2.4} />
+                  <Text style={styles.emptyButtonText}>Create group</Text>
+                </Pressable>
+              )}
             </View>
-            <Text style={styles.emptyTitle}>
-              {searchQuery ? 'No groups found' : 'No groups yet'}
-            </Text>
-            <Text style={styles.emptySubtitle}>
-              {searchQuery
-                ? `No group matched "${searchQuery}"`
-                : 'Create your first group to start sharing expenses with friends.'}
-            </Text>
-            {!searchQuery && (
-              <Pressable
-                onPress={handleCreateGroup}
-                style={styles.emptyButton}
-              >
-                <Plus size={moderateScale(18)} color={COLORS.white} strokeWidth={2.4} />
-                <Text style={styles.emptyButtonText}>Create group</Text>
-              </Pressable>
-            )}
-          </View>
+          )
         }
       />
     </View>
@@ -241,6 +317,9 @@ const styles = StyleSheet.create({
     marginLeft: moderateScale(10),
     paddingVertical: 0,
   },
+  searchLoader: {
+    paddingHorizontal: moderateScale(4),
+  },
   clearSearch: {
     padding: 4,
   },
@@ -263,6 +342,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(8),
     paddingVertical: moderateScale(2),
     borderRadius: moderateScale(10),
+  },
+  loadingBadgeContainer: {
+    paddingHorizontal: moderateScale(10),
+    paddingVertical: moderateScale(2),
+    backgroundColor: '#E2EFF5',
+    borderRadius: moderateScale(10),
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: moderateScale(30),
+    height: moderateScale(22),
   },
   emptyContainer: {
     alignItems: 'center',

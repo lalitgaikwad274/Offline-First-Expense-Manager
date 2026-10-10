@@ -11,6 +11,7 @@ import {
   addGroupExpense,
   setGroupExpenses,
   deleteGroupExpense,
+  setLoading as setGroupLoading,
 } from "./groupExpenseSlice";
 import { CreateGroupExpensePayload } from "../types/groupExpense";
 
@@ -71,6 +72,7 @@ export const getAllGroups = () => {
     return async (dispatch: any) => {
         try {
             dispatch(setIsLoading(true));
+            dispatch(setGroupLoading(true));
             console.log("######## 65")
             const result = await serverCall(ENDPOINTS.GET_GROUP, "GET");
             console.log("Raw groups API response:", result);
@@ -85,6 +87,7 @@ export const getAllGroups = () => {
             throw error;
         } finally {
             dispatch(setIsLoading(false));
+            dispatch(setGroupLoading(false));
         }
     };
 }
@@ -157,6 +160,7 @@ export const getAllExpenses = () => {
     return async (dispatch: any) => {
         try {
             dispatch(setIsLoading(true));
+            dispatch(setGroupLoading(true));
             const result = await serverCall(ENDPOINTS.GET_ALL_EXPENSES, "GET");
             console.log("Raw all expenses API response:", result);
             const raw = result?.data;
@@ -172,6 +176,7 @@ export const getAllExpenses = () => {
             throw error;
         } finally {
             dispatch(setIsLoading(false));
+            dispatch(setGroupLoading(false));
         }
     };
 }

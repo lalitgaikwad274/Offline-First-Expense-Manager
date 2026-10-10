@@ -300,7 +300,85 @@ export const RecentExpensesSkeleton: React.FC = () => {
   );
 };
 
+/**
+ * Shimmer skeleton for individual GroupCard
+ */
+export const GroupCardSkeleton: React.FC = () => {
+  return (
+    <View style={skeletonStyles.groupCard}>
+      <View style={skeletonStyles.groupCardContent}>
+        {/* Avatar Placeholder */}
+        <ShimmerPlaceholder
+          width={moderateScale(54)}
+          height={moderateScale(54)}
+          borderRadius={moderateScale(27)}
+          style={{ marginRight: moderateScale(14) }}
+        />
+
+        {/* Group Info Placeholders */}
+        <View style={{ flex: 1 }}>
+          <View style={[skeletonStyles.rowBetween, { marginBottom: moderateScale(6) }]}>
+            <ShimmerPlaceholder
+              width={'60%'}
+              height={moderateScale(16)}
+              borderRadius={moderateScale(6)}
+            />
+            <ShimmerPlaceholder
+              width={moderateScale(18)}
+              height={moderateScale(18)}
+              borderRadius={moderateScale(9)}
+            />
+          </View>
+
+          <ShimmerPlaceholder
+            width={'42%'}
+            height={moderateScale(12)}
+            borderRadius={moderateScale(6)}
+            style={{ marginBottom: moderateScale(10) }}
+          />
+
+          <ShimmerPlaceholder
+            width={moderateScale(110)}
+            height={moderateScale(24)}
+            borderRadius={moderateScale(10)}
+          />
+        </View>
+      </View>
+    </View>
+  );
+};
+
+/**
+ * Shimmer skeleton list for GroupCards
+ */
+export const GroupListSkeleton: React.FC<{ count?: number }> = ({ count = 3 }) => {
+  return (
+    <View style={skeletonStyles.groupListOuter}>
+      {Array.from({ length: count }).map((_, index) => (
+        <GroupCardSkeleton key={`group_card_skeleton_${index}`} />
+      ))}
+    </View>
+  );
+};
+
 const skeletonStyles = StyleSheet.create({
+  groupCard: {
+    backgroundColor: COLORS.surfaceCard,
+    borderRadius: moderateScale(20),
+    padding: moderateScale(16),
+    marginBottom: moderateScale(14),
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    ...SHADOWS.soft,
+  },
+  groupCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  groupListOuter: {
+    width: '100%',
+    paddingTop: moderateScale(2),
+  },
   rowBetween: {
     flexDirection: 'row',
     alignItems: 'center',
