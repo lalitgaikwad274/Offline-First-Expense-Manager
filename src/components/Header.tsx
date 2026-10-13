@@ -39,10 +39,13 @@ export const Header = memo(({
       {/* Top Bar: Left Drawer Button & Clickable Logo + Right Action Buttons */}
       <View style={styles.topBar}>
         <View style={styles.topLeftGroup}>
-          {/* Drawer Menu Button */}
+          {/* Clickable Initials / Dev Diagnostics Button */}
           <Pressable
             hitSlop={8}
-            style={styles.logoButton}
+            // onPress={handleLogoPress}
+            style={({ pressed }) => [styles.logoButton, pressed && { opacity: 0.8 }]}
+            accessibilityRole="button"
+            accessibilityLabel="Developer Diagnostics and Profile"
           >
             <Text style={styles.logoText}>{userInitials}</Text>
           </Pressable>

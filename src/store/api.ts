@@ -15,11 +15,11 @@ import {
 } from "./groupExpenseSlice";
 import { CreateGroupExpensePayload } from "../types/groupExpense";
 
-export const getTransactions = () => {
+export const getTransactions = (limit = 20) => {
     return async (dispatch: any) => {
         try {
             dispatch(setIsLoading(true));
-            const result = await serverCall(ENDPOINTS.GET_TRANSACTION, "GET");
+            const result = await serverCall(ENDPOINTS.GET_TRANSACTION + `?limit=${limit}`, "GET");
             console.log("Raw transactions API response:", result);
 
             // Handle responses whether returned directly as an array or wrapped in data/transactions

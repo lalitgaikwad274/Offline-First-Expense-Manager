@@ -23,4 +23,5 @@ export const SCREEN_NAMES = {
   SETTLE_GROUP: 'SettleGroup',
   GROUP_SETTINGS: 'GroupSettings',
   NOTIFICATIONS: 'Notifications',
+  API_DEBUGGER: 'ApiDebugger',
 } as const;

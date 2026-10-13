@@ -23,7 +23,9 @@ import {
   RefreshCw,
   ShieldCheck,
   User,
+  Bug,
 } from 'lucide-react-native';
+import { apiLogger } from '../../services/apiLogger';
 import { useAppSelector } from '../../store';
 import { COLORS, moderateScale, SHADOWS, APP_CONFIG } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
@@ -72,7 +74,20 @@ const ProfileScreen: React.FC = () => {
 
   const handleBankDetail = () => {
     navigation.navigate(SCREEN_NAMES.BANK_ACCOUNT_SCREEN);
-  }
+  };
+
+  const [logStats, setLogStats] = React.useState(apiLogger.getStats());
+
+  React.useEffect(() => {
+    const unsub = apiLogger.subscribe(() => {
+      setLogStats(apiLogger.getStats());
+    });
+    return unsub;
+  }, []);
+
+  const handleOpenApiDebugger = () => {
+    navigation.navigate(SCREEN_NAMES.API_DEBUGGER);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -224,6 +239,47 @@ const ProfileScreen: React.FC = () => {
               </View>
               <Text style={styles.menuValue}>{APP_CONFIG.version}</Text>
             </View>
+
+            <View style={styles.itemDivider} />
+
+            <TouchableOpacity onPress={handleOpenApiDebugger} style={styles.menuItem}>
+              <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: 'rgba(8, 122, 166, 0.12)' }]}>
+                  <Bug size={moderateScale(18)} color={COLORS.primary} strokeWidth={2.2} />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>API Debugger</Text>
+                  <Text style={{ fontSize: moderateScale(11), color: COLORS.gray, marginTop: 1 }}>
+                    {logStats.total > 0
+                      ? `${logStats.total} logged (${logStats.httpError + logStats.networkError} errors)`
+                      : 'Live network monitor'}
+                  </Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: moderateScale(6) }}>
+                {logStats.httpError + logStats.networkError > 0 && (
+                  <View
+                    style={{
+                      backgroundColor: '#FFE9EC',
+                      paddingHorizontal: moderateScale(6),
+                      paddingVertical: moderateScale(2),
+                      borderRadius: moderateScale(10),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: moderateScale(11),
+                        color: '#D81730',
+                        fontWeight: '700',
+                      }}
+                    >
+                      {logStats.httpError + logStats.networkError} Err
+                    </Text>
+                  </View>
+                )}
+                <ChevronRight size={moderateScale(18)} color={COLORS.gray} />
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
 

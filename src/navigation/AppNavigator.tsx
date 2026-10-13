@@ -20,6 +20,7 @@ import SettleGroupScreen from '../screens/GroupExpense/SettleGroupScreen';
 import GroupSettingsScreen from '../screens/GroupExpense/GroupSettingsScreen';
 import { GroupMember } from '../types/groupExpense';
 import NotificationScreen from '../screens/notifications/NotificationScreen';
+import ApiDebuggerScreen from '../screens/debug/ApiDebuggerScreen';
 
 export type AppStackParamList = {
   Home: undefined;
@@ -31,6 +32,7 @@ export type AppStackParamList = {
   Analytics: undefined;
   Profile: undefined;
   BankAccountScreen: undefined;
+  ApiDebugger: undefined;
 
   // Group Expense
   GroupExpenses: undefined;
@@ -159,6 +161,11 @@ const AppNavigator = () => {
       <Stack.Screen
         name={SCREEN_NAMES.NOTIFICATIONS}
         component={NotificationScreen}
+      />
+
+      <Stack.Screen
+        name={SCREEN_NAMES.API_DEBUGGER}
+        component={ApiDebuggerScreen}
       />
 
     </Stack.Navigator>

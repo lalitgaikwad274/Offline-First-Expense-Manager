@@ -71,9 +71,7 @@ export const ExpenseDashboard: React.FC = () => {
   const {
     expenses,
     income,
-    isOffline,
     selectedPeriod,
-    activeTab,
     user,
   } = useAppSelector(state => state.expense);
 
