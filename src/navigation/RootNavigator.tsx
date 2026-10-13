@@ -93,7 +93,7 @@ const RootNavigator = () => {
               pressed && { opacity: 0.8, transform: [{ scale: 0.95 }] },
             ]}>
             <Image
-              source={require('../Assets/icons/phone.png')}
+              source={require('../Assets/icons/bug.png')}
               style={styles.loggerIcon}
             />
           </Pressable>
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mintLight,
   },
   loggerStyle: {
-    backgroundColor: COLORS.accent,
+    backgroundColor: COLORS.expenseDark,
     padding: moderateScale(12),
     borderRadius: moderateScale(20),
     position: 'absolute',
@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
     height: moderateScale(24),
     width: moderateScale(24),
     resizeMode: 'contain',
+    tintColor: COLORS.white
   },
 });
 
