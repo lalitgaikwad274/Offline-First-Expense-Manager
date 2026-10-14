@@ -50,29 +50,17 @@ const LoginScreen = () => {
             );
 
             // Call backend login to sync/fetch user details in database
-            try {
-                const result = await serverCall(ENDPOINTS.LOGIN, "POST");
-                const backendUser = result?.data?.user;
-                if (backendUser) {
-                    dispatch(setUserDetail({
-                        id: backendUser.id || userCredential.user.uid,
-                        name: backendUser.name?.trim() || userCredential.user.displayName?.trim() || email.split('@')[0],
-                        initials: (backendUser.name?.trim() || userCredential.user.displayName?.trim() || email)[0]?.toUpperCase() || "U",
-                        email: backendUser.email || userCredential.user.email || email,
-                        notificationCount: 0,
-                    }));
-                }
-            } catch (apiError) {
-                console.warn('Backend login sync warning:', apiError);
-                if (userCredential.user) {
-                    dispatch(setUserDetail({
-                        id: userCredential.user.uid,
-                        name: userCredential.user.displayName?.trim() || email.split('@')[0],
-                        initials: (userCredential.user.displayName?.trim() || email)[0]?.toUpperCase() || "U",
-                        email: userCredential.user.email || email,
-                        notificationCount: 0,
-                    }));
-                }
+            const result = await serverCall(ENDPOINTS.LOGIN, "POST");
+            const backendUser = result?.data?.user;
+            if (backendUser) {
+                dispatch(setUserDetail({
+                    id: backendUser.id || userCredential.user.uid,
+                    name: backendUser.name?.trim() || userCredential.user.displayName?.trim() || email.split('@')[0],
+                    initials: (backendUser.name?.trim() || userCredential.user.displayName?.trim() || email)[0]?.toUpperCase() || "U",
+                    email: backendUser.email || userCredential.user.email || email,
+                    phoneNumber: backendUser.phone_number || null,
+                    notificationCount: 0,
+                }));
             }
 
             Alert.alert('Success', 'Logged in successfully!');

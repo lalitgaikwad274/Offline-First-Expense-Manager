@@ -6,12 +6,6 @@ import {
   GroupSettlement,
   GroupBalanceCalculation,
 } from '../types/groupExpense';
-import {
-  CURRENT_USER,
-  INITIAL_EXPENSES,
-  INITIAL_GROUPS,
-  INITIAL_SETTLEMENTS,
-} from '../utils/groupExpense/mockData';
 import { calculateBalances } from '../utils/groupExpense/calculateBalances';
 import { RootState } from './index';
 

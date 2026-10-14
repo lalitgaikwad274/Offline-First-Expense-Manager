@@ -79,7 +79,7 @@ export const serverCall = async (
          });
          throw tokenErr;
       }
-
+      console.log("###### idToken", idToken)
       const contentType = headers['Content-Type'] || headers['content-type'] || "application/json";
       const requestHeaders: Record<string, string> = {
          "Content-Type": contentType,

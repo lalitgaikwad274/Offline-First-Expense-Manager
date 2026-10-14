@@ -43,8 +43,7 @@ export const CreateGroupScreen = () => {
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const topInset = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : insets.top;
-
-  const currentUser = useAppSelector((state) => state.groupExpense.currentUser);
+  const currentUser = useAppSelector(state => state.expense.user);
 
   const [groupName, setGroupName] = useState('');
   const [description, setDescription] = useState('');
@@ -55,7 +54,18 @@ export const CreateGroupScreen = () => {
   const [contacts, setContacts] = useState<GroupMember[]>(() => {
     const list = [...CONTACTS_POOL];
     if (!list.some((c) => c.id === currentUser.id)) {
-      list.unshift(currentUser);
+      let currentUserData = {
+        id: currentUser.id,
+        name: currentUser.name,
+        phone: currentUser.phoneNumber,
+        email: currentUser.email,
+        initials: currentUser.name.charAt(0).toUpperCase() + currentUser.name.charAt(1).toUpperCase(),
+        color: '#845EF7',
+        isCurrentUser: true,
+        isAdmin: true,
+      }
+      console.log("##### currentUserData", currentUserData)
+      list.unshift(currentUserData);
     }
     return list;
   });
@@ -160,7 +170,7 @@ export const CreateGroupScreen = () => {
     console.log("####### newGroup", newGroup)
     dispatch(createGroup(newGroup))
     // dispatch(createGroup(newGroup));
-    navigation.replace(SCREEN_NAMES.GROUP_DETAILS, { groupId: newGroup.id });
+    // navigation.replace(SCREEN_NAMES.GROUP_DETAILS, { groupId: newGroup.id });
   };
 
   return (

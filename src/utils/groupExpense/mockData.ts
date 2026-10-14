@@ -3,7 +3,7 @@ import { Group, GroupExpense, GroupMember, GroupSettlement } from '../../types/g
 export const CURRENT_USER: GroupMember = {
   id: 'user_akshay',
   name: 'Akshay Salunke',
-  phone: '+91 98765 00000',
+  phone: '+91 9876543210',
   email: 'akshay@example.com',
   initials: 'AS',
   color: '#087AA6',
@@ -12,7 +12,14 @@ export const CURRENT_USER: GroupMember = {
 };
 
 export const CONTACTS_POOL: GroupMember[] = [
-  CURRENT_USER,
+  {
+    id: 'user_akshay',
+    name: 'Akshay Salunke',
+    phone: '+91 9876543210',
+    email: 'akshay@example.com',
+    initials: 'AS',
+    color: '#087AA6',
+  },
   {
     id: 'user_rahul',
     name: 'Rahul Sharma',

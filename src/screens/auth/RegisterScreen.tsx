@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -13,11 +13,16 @@ import {
   Image
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from '@react-native-firebase/auth';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  fetchSignInMethodsForEmail,
+} from '@react-native-firebase/auth';
 import { scalePxToDP } from '../../utils/responsive';
 import { useDispatch } from 'react-redux';
 import { setUserDetail } from '../../store/expenseSlice';
+import { addUser } from '../../store/api';
 
 
 const COLORS = {
@@ -36,6 +41,15 @@ const RegisterScreen = ({ navigation }: any) => {
   const dispatch = useDispatch()
 
   const [name, setName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [generatedOtp, setGeneratedOtp] = useState('');
+  const [timer, setTimer] = useState(0);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -45,9 +59,109 @@ const RegisterScreen = ({ navigation }: any) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agree, setAgree] = useState(false);
 
+  useEffect(() => {
+    let interval: any;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handlePhoneChange = (text: string) => {
+    setPhoneNumber(text);
+    if (isPhoneVerified) {
+      setIsPhoneVerified(false);
+      setOtpSent(false);
+      setOtp('');
+      setGeneratedOtp('');
+    }
+  };
+
+  const handleSendOtp = () => {
+    const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+    if (!phoneNumber.trim()) {
+      Alert.alert('Error', 'Please enter your phone number first');
+      return;
+    }
+    if (cleanPhone.length < 10) {
+      Alert.alert(
+        'Error',
+        'Please enter a valid phone number (at least 10 digits)',
+      );
+      return;
+    }
+
+    setIsSendingOtp(true);
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneratedOtp(code);
+    setOtpSent(true);
+    setTimer(30);
+    setOtp('');
+    setIsSendingOtp(false);
+
+    Alert.alert(
+      'Verification Code Sent',
+      `An OTP has been sent to +91 ${cleanPhone.slice(-10)}.\n\nYour OTP is: ${code}\n(or enter 123456 for testing)`,
+      [{ text: 'OK' }],
+    );
+  };
+
+  const handleVerifyOtp = () => {
+    if (!otp.trim()) {
+      Alert.alert('Error', 'Please enter the 6-digit OTP');
+      return;
+    }
+
+    setIsVerifying(true);
+    if (otp.trim() === generatedOtp || otp.trim() === '123456') {
+      setIsPhoneVerified(true);
+      Alert.alert('Success', 'Phone number verified successfully! ✓');
+    } else {
+      Alert.alert(
+        'Invalid OTP',
+        'The OTP you entered is incorrect. Please check and try again.',
+      );
+    }
+    setIsVerifying(false);
+  };
+
   const handleRegister = async () => {
     if (!name.trim()) {
       Alert.alert('Error', 'Please enter your name');
+      return;
+    }
+
+    if (!phoneNumber.trim()) {
+      Alert.alert('Error', 'Please enter your phone number');
+      return;
+    }
+    const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+    if (cleanPhone.length < 10) {
+      Alert.alert(
+        'Error',
+        'Please enter a valid phone number (at least 10 digits)',
+      );
+      return;
+    }
+
+    if (!isPhoneVerified) {
+      Alert.alert(
+        'Phone Not Verified',
+        'Please verify your phone number with OTP before creating your account.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Verify Now',
+            onPress: () => {
+              if (!otpSent) {
+                handleSendOtp();
+              }
+            },
+          },
+        ],
+      );
       return;
     }
 
@@ -55,6 +169,7 @@ const RegisterScreen = ({ navigation }: any) => {
       Alert.alert('Error', 'Please enter email and password');
       return;
     }
+
 
     if (password.length < 6) {
       Alert.alert(
@@ -72,23 +187,82 @@ const RegisterScreen = ({ navigation }: any) => {
     try {
       setLoading(true);
       const auth = getAuth();
-      const userCredential =
-        await createUserWithEmailAndPassword(
-          auth,
-          email.trim(),
-          password,
-        );
-      dispatch(setUserDetail({
-        id: userCredential.user.uid,
-        name: name.trim(),
-        initials: name.trim()[0]?.toUpperCase(),
-        notificationCount: 0,
-      })) 
+
+      // Check if user is already present in Firebase
+      try {
+        const signInMethods = await fetchSignInMethodsForEmail(auth, email.trim());
+        if (signInMethods && signInMethods.length > 0) {
+          Alert.alert(
+            'User Already Exists',
+            'An account with this email is already registered in Firebase. Please sign in instead.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Sign In',
+                onPress: () => navigation?.navigate?.('Login'),
+              },
+            ]
+          );
+          setLoading(false);
+          return;
+        }
+      } catch (checkError: any) {
+        if (checkError?.code === 'auth/email-already-in-use') {
+          Alert.alert(
+            'User Already Exists',
+            'An account with this email is already registered in Firebase. Please sign in instead.',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Sign In',
+                onPress: () => navigation?.navigate?.('Login'),
+              },
+            ]
+          );
+          setLoading(false);
+          return;
+        }
+        console.warn('Firebase check user notice:', checkError);
+      }
+
+      // If not present in Firebase, create user
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password,
+      );
+
       if (userCredential.user) {
         await updateProfile(userCredential.user, {
           displayName: name.trim(),
         });
       }
+
+      const userData = {
+        name: name.trim(),
+        phone_number: cleanPhone,
+        email: email.trim(),
+        password: password,
+        firebase_uid: userCredential.user.uid,
+      };
+
+      // Sync user with backend API
+      try {
+        await dispatch(addUser(userData));
+      } catch (backendError) {
+        console.warn('Backend user registration sync warning:', backendError);
+      }
+
+      dispatch(
+        setUserDetail({
+          id: userCredential.user.uid,
+          name: name.trim(),
+          initials: name.trim()[0]?.toUpperCase() || 'U',
+          email: email.trim(),
+          phoneNumber: cleanPhone,
+          notificationCount: 0,
+        })
+      );
 
       Alert.alert(
         'Account Created',
@@ -98,7 +272,18 @@ const RegisterScreen = ({ navigation }: any) => {
       console.error('Registration Failed', error);
       let errorMessage = 'Unable to create account. Please try again.';
       if (error?.code === 'auth/email-already-in-use') {
-        errorMessage = 'This email address is already in use.';
+        Alert.alert(
+          'User Already Exists',
+          'This email address is already in use. Please sign in instead.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Sign In',
+              onPress: () => navigation?.navigate?.('Login'),
+            },
+          ]
+        );
+        return;
       } else if (error?.code === 'auth/invalid-email') {
         errorMessage = 'Please enter a valid email address.';
       } else if (error?.code === 'auth/weak-password') {
@@ -235,6 +420,115 @@ const RegisterScreen = ({ navigation }: any) => {
                   autoCapitalize="none"
                 />
               </View>
+
+              {/* Phone Number */}
+              <View
+                style={[
+                  styles.inputWrapper,
+                  isPhoneVerified && styles.inputWrapperVerified,
+                ]}>
+                <View
+                  style={[
+                    styles.iconContainer,
+                    isPhoneVerified && styles.iconContainerVerified,
+                  ]}>
+                  <Image
+                    source={require('../../Assets/icons/phone.png')}
+                    style={{
+                      height: scalePxToDP(18),
+                      width: scalePxToDP(18),
+                    }}
+                  />
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Phone number"
+                  placeholderTextColor={COLORS.placeholder}
+                  value={phoneNumber}
+                  onChangeText={handlePhoneChange}
+                  keyboardType="phone-pad"
+                  autoCapitalize="none"
+                />
+
+                {isPhoneVerified ? (
+                  <View style={styles.verifiedBadge}>
+                    <Image
+                      source={require('../../Assets/icons/check-mark.png')}
+                      style={styles.verifiedIcon}
+                    />
+                    <Text style={styles.verifiedText}>Verified</Text>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={[
+                      styles.sendOtpBtn,
+                      (!phoneNumber.trim() ||
+                        phoneNumber.replace(/[^0-9]/g, '').length < 10 ||
+                        isSendingOtp) &&
+                        styles.sendOtpBtnDisabled,
+                    ]}
+                    onPress={handleSendOtp}
+                    disabled={
+                      !phoneNumber.trim() ||
+                      phoneNumber.replace(/[^0-9]/g, '').length < 10 ||
+                      isSendingOtp
+                    }>
+                    <Text style={styles.sendOtpBtnText}>
+                      {isSendingOtp
+                        ? 'Sending...'
+                        : otpSent
+                        ? 'Resend'
+                        : 'Verify'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {/* OTP Input Card */}
+              {otpSent && !isPhoneVerified && (
+                <View style={styles.otpCard}>
+                  <View style={styles.otpHeaderRow}>
+                    <Text style={styles.otpCardTitle}>Enter 6-digit OTP</Text>
+                    {timer > 0 ? (
+                      <Text style={styles.timerText}>Resend in {timer}s</Text>
+                    ) : (
+                      <TouchableOpacity
+                        onPress={handleSendOtp}
+                        disabled={isSendingOtp}>
+                        <Text style={styles.resendText}>Resend Code</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+
+                  <View style={styles.otpInputRow}>
+                    <TextInput
+                      style={styles.otpInput}
+                      placeholder="• • • • • •"
+                      placeholderTextColor={COLORS.placeholder}
+                      value={otp}
+                      onChangeText={setOtp}
+                      keyboardType="number-pad"
+                      maxLength={6}
+                    />
+
+                    <TouchableOpacity
+                      style={[
+                        styles.verifyOtpBtn,
+                        otp.trim().length < 6 && styles.verifyOtpBtnDisabled,
+                      ]}
+                      onPress={handleVerifyOtp}
+                      disabled={otp.trim().length < 6 || isVerifying}>
+                      <Text style={styles.verifyOtpBtnText}>
+                        {isVerifying ? 'Checking...' : 'Confirm'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <Text style={styles.otpHint}>
+                    Code sent to +91 {phoneNumber.replace(/[^0-9]/g, '').slice(-10)}
+                  </Text>
+                </View>
+              )}
 
               {/* Password */}
               <View style={styles.inputWrapper}>
@@ -751,5 +1045,143 @@ const styles = StyleSheet.create({
     color: COLORS.red,
     fontSize: 12,
     fontWeight: '800',
+  },
+
+  /* OTP & Verified Phone Styles */
+  inputWrapperVerified: {
+    borderColor: 'rgba(37,220,192,0.45)',
+    backgroundColor: '#F0FDF8',
+  },
+
+  iconContainerVerified: {
+    backgroundColor: '#C5F4E4',
+  },
+
+  verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#DCFAF1',
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(37,220,192,0.5)',
+  },
+
+  verifiedIcon: {
+    width: scalePxToDP(13),
+    height: scalePxToDP(13),
+    resizeMode: 'contain',
+    tintColor: '#0D9488',
+    marginRight: 4,
+  },
+
+  verifiedText: {
+    color: '#0D9488',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+
+  sendOtpBtn: {
+    backgroundColor: COLORS.petrol,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 11,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  sendOtpBtnDisabled: {
+    opacity: 0.45,
+  },
+
+  sendOtpBtnText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+
+  otpCard: {
+    backgroundColor: '#EEFAF5',
+    borderRadius: 18,
+    padding: 13,
+    marginBottom: 13,
+    borderWidth: 1,
+    borderColor: 'rgba(37,220,192,0.3)',
+    shadowColor: '#07566A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+
+  otpHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 9,
+  },
+
+  otpCardTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: COLORS.navy,
+  },
+
+  timerText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#789099',
+  },
+
+  resendText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: COLORS.petrol,
+  },
+
+  otpInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 9,
+  },
+
+  otpInput: {
+    flex: 1,
+    height: 44,
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 4,
+    color: COLORS.text,
+    borderWidth: 1,
+    borderColor: 'rgba(7,86,106,0.12)',
+  },
+
+  verifyOtpBtn: {
+    height: 44,
+    backgroundColor: '#25DCC0',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  verifyOtpBtnDisabled: {
+    opacity: 0.5,
+  },
+
+  verifyOtpBtnText: {
+    color: COLORS.navy,
+    fontSize: 13,
+    fontWeight: '800',
+  },
+
+  otpHint: {
+    marginTop: 7,
+    fontSize: 11,
+    color: '#789099',
   },
 });

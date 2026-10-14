@@ -1,6 +1,7 @@
 import { APP_CONFIG } from './constants';
 import { Expense, ExpenseCategory } from '../types/expense';
 import { GroupExpense, ExpenseParticipant, SplitType } from '../types/groupExpense';
+import { ConfirmationResult, getAuth, linkWithCredential, PhoneAuthProvider, signInWithPhoneNumber } from '@react-native-firebase/auth';
 
 /**
  * Format a number to currency with Indian Rupee (or configured) symbol
@@ -226,3 +227,40 @@ export const formatGroupExpense = (raw: any): GroupExpense => {
   };
 };
 
+export const sendOtp = async (phoneNumber: string) => {
+
+}
+
+
+export const verifyPhoneOTP = async (
+  confirmation: ConfirmationResult,
+  code: string
+) => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    throw new Error('Please log in first');
+  }
+
+  try {
+    const credential = PhoneAuthProvider.credential(
+      confirmation.verificationId,
+      code
+    );
+
+    const result = await linkWithCredential(
+      currentUser,
+      credential
+    );
+
+    return {
+      uid: result.user.uid,
+      phoneNumber: result.user.phoneNumber,
+      isVerified: true,
+    };
+  } catch (error) {
+    console.error('Phone verification failed:', error);
+    throw error;
+  }
+};

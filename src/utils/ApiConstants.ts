@@ -5,9 +5,11 @@ export const BASE_URL = isProd ? "https://expensio-backend-a96v.onrender.com" : 
 
 
 export const ENDPOINTS = {
+   LOGIN: `/auth/login`,
+   REGISTER: '/auth/register',
+   GET_USER: '/auth/user',
    ADD_TRANSACTION: `/api/transactions`,
    GET_TRANSACTION: `/api/transactions`,
-   LOGIN: `/auth/login`,
    ADD_BANK_ACCOUNT: `/api/bank-accounts/`,
    GET_BANK_ACCOUNT: `/api/bank-accounts`,
    DELETE_BANK_ACCOUNT: `/api/bank-accounts`,

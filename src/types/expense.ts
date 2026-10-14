@@ -51,6 +51,7 @@ export interface UserProfile {
   name: string;
   initials: string;
   email?: string;
+  phoneNumber?: string;
   avatarUrl?: string;
   notificationCount: number;
 }

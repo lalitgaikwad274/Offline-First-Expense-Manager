@@ -28,7 +28,7 @@ import BottomNavigation from './BottomNavigation';
 import { getAuth } from '@react-native-firebase/auth';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SCREEN_NAMES } from '../utils/screenNames';
-import { getBankDetails, getTransactions } from '../store/api';
+import { getBankDetails, getTransactions, getUser } from '../store/api';
 import NoBankAccountCard from './NoBankAccountCard';
 import SpendingOverviewCard from './SpendingOverviewCard';
 import {
@@ -75,16 +75,6 @@ export const ExpenseDashboard: React.FC = () => {
     user,
   } = useAppSelector(state => state.expense);
 
-  useEffect(()=>{
-      const auth = getAuth();
-      const currentUser = auth.currentUser;
-      dispatch(setUserDetail({
-        id: currentUser?.uid || "",
-        name: currentUser?.displayName || "",
-        initials: (currentUser?.displayName || "").trim()[0]?.toUpperCase() || "",
-        notificationCount: 0,
-      }))
-  }, [])
 
   const navigation = useNavigation<any>();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -104,6 +94,7 @@ export const ExpenseDashboard: React.FC = () => {
       try {
         setIsDataLoading(true);
         await Promise.allSettled([
+          dispatch(getUser()),
           dispatch(getTransactions()),
           dispatch(getBankDetails()),
         ]);

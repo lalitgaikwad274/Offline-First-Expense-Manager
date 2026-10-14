@@ -14,6 +14,45 @@ import {
   setLoading as setGroupLoading,
 } from "./groupExpenseSlice";
 import { CreateGroupExpensePayload } from "../types/groupExpense";
+import { setUserDetail } from "./expenseSlice";
+
+export const addUser = (user: any) => {
+    return async (dispatch: any) => {
+        try {
+            console.log("@31 user", user)
+            const result = await serverCall(ENDPOINTS.REGISTER, "POST", {}, user);
+            console.log("@31 Raw user addition response:", result);
+            // dispatch(setUserDetail(result));
+            return result;
+        } catch (error) {
+            console.error("@31 Error in addUser:", error);
+            throw error;
+        }
+    };
+}
+
+export const getUser = () => {
+    return async (dispatch: any) => {
+        try {
+            const result = await serverCall(ENDPOINTS.GET_USER, "GET");
+            console.log("Raw user API response:", result);
+            let backendUser = result?.data?.user;
+            if (backendUser) {
+                dispatch(setUserDetail({
+                    id: backendUser.id,
+                    name: backendUser.name?.trim(),
+                    initials: (backendUser.name?.trim())[0]?.toUpperCase(),
+                    email: backendUser.email,
+                    phoneNumber: backendUser.phone_number,
+                    notificationCount: 0,
+                }));
+            }
+        } catch (error) {
+            console.error("Error in getUser:", error);
+            throw error;
+        }
+    }
+}
 
 export const getTransactions = (limit = 20) => {
     return async (dispatch: any) => {
@@ -215,6 +254,24 @@ export const deleteGroupExpenseApi = (groupId: string, expenseId: string) => {
             return result;
         } catch (error) {
             console.error("Error in deleteGroupExpenseApi:", error);
+            throw error;
+        } finally {
+            dispatch(setIsLoading(false));
+        }
+    };
+}
+
+export const getGroupsByUserId = (userId: string) => {
+    return async (dispatch: any) => {
+        try {
+            dispatch(setIsLoading(true));
+            const result = await serverCall(ENDPOINTS.GET_GROUPS_BY_USER_ID(userId), "GET");
+            console.log("Raw groups by user ID API response:", result);
+            const groupsList = result?.data;
+            dispatch(setGroups(groupsList));
+            return groupsList;
+        } catch (error) {
+            console.error("Error in getGroupsByUserId:", error);
             throw error;
         } finally {
             dispatch(setIsLoading(false));
