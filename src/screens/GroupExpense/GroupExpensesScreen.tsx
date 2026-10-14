@@ -21,7 +21,7 @@ import { COLORS, SHADOWS, SPACING, moderateScale } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
 import GroupCard from '../../components/groupExpense/GroupCard';
 import { calculateBalances } from '../../utils/groupExpense/calculateBalances';
-import { getAllExpenses, getAllGroups } from '../../store/api';
+import { getAllExpenses, getAllGroups, getUserGroups } from '../../store/api';
 import { GroupListSkeleton } from '../../components/Shimmer';
 
 export const GroupExpensesScreen = () => {
@@ -38,7 +38,8 @@ export const GroupExpensesScreen = () => {
   const groups = useAppSelector(getGroups);
   const expenses = useAppSelector((state) => state.groupExpense.expenses);
   const settlements = useAppSelector((state) => state.groupExpense.settlements);
-  const currentUser = useAppSelector((state) => state.groupExpense.currentUser);
+  const currentUser = useAppSelector((state) => state.expense.user);
+  const userGroups = useAppSelector((state) => state.groupExpense.userGroups);
   const reduxLoading = useAppSelector(
     (state) => state.groupExpense.isLoading || state.expense.isLoading
   );
@@ -49,11 +50,27 @@ export const GroupExpensesScreen = () => {
       await Promise.all([
         dispatch(getAllExpenses()),
         dispatch(getAllGroups()),
+        dispatch(getUserGroups(currentUser?.id))
       ]);
     } catch (error) {
       console.error('Error fetching group expenses data:', error);
     }
   }, [dispatch]);
+
+  const groupsData = useMemo(() => {
+    if (userGroups.length === 0) {
+      return groups;
+    }
+    const seen = new Set<string>();
+    const result = [...userGroups, ...groups];
+    return result.filter((group) => {
+      if (seen.has(group.id)) {
+        return false;
+      }
+      seen.add(group.id);
+      return true;
+    });
+  }, [userGroups, groups])
 
   useEffect(() => {
     let isMounted = true;
@@ -93,11 +110,11 @@ export const GroupExpensesScreen = () => {
   // Filter groups by search query
   const filteredGroups = useMemo(() => {
     const query = debouncedSearchQuery.trim().toLowerCase();
-    if (!query) return groups;
-    return groups.filter((g) =>
+    if (!query) return groupsData;
+    return groupsData.filter((g) =>
       g.name.toLowerCase().includes(query)
     );
-  }, [groups, debouncedSearchQuery]);
+  }, [groupsData, debouncedSearchQuery]);
 
   const isLoading = isFetching || reduxLoading || isSearching;
 

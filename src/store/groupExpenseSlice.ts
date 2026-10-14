@@ -11,6 +11,7 @@ import { RootState } from './index';
 
 export interface GroupExpenseState {
   groups: Group[];
+  userGroups: Group[];
   expenses: GroupExpense[];
   settlements: GroupSettlement[];
   currentUser: GroupMember;
@@ -20,6 +21,7 @@ export interface GroupExpenseState {
 
 const initialState: GroupExpenseState = {
   groups: [],
+  userGroups: [],
   expenses: [],
   settlements: [],
   currentUser: {} as GroupMember,
@@ -141,6 +143,35 @@ export const groupExpenseSlice = createSlice({
         }
       }
     },
+    setUserGroups: (state, action: PayloadAction<any>) => {
+      const rawList = Array.isArray(action.payload)
+        ? action.payload
+        : []
+
+      state.userGroups = rawList
+
+      // if (rawList) {
+      //   const seen = new Set<string>();
+      //   const uniqueGroups: Group[] = [];
+      //   for (const g of rawList) {
+      //     if (!g) continue;
+      //     const idStr = String(g.id);
+      //     if (!seen.has(idStr)) {
+      //       seen.add(idStr);
+      //       uniqueGroups.push(g);
+      //     }
+      //   }
+      //   state.groups = uniqueGroups;
+      // } else if (action.payload && typeof action.payload === 'object' && action.payload.id) {
+      //   const singleGroup = action.payload as Group;
+      //   const exists = state.groups.findIndex((g) => String(g.id) === String(singleGroup.id));
+      //   if (exists >= 0) {
+      //     state.groups[exists] = singleGroup;
+      //   } else {
+      //     state.groups.unshift(singleGroup);
+      //   }
+      // }
+    },
     setGroupExpenses: (state, action: PayloadAction<GroupExpense[]>) => {
       const newExpenses = Array.isArray(action.payload) ? action.payload : [];
       if (newExpenses.length === 0) return;
@@ -175,6 +206,7 @@ export const {
   addSettlement,
   deleteSettlement,
   setGroups,
+  setUserGroups,
   setGroupExpenses,
   setSettlements,
 } = groupExpenseSlice.actions;

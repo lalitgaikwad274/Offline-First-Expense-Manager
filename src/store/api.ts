@@ -12,6 +12,7 @@ import {
   setGroupExpenses,
   deleteGroupExpense,
   setLoading as setGroupLoading,
+  setUserGroups,
 } from "./groupExpenseSlice";
 import { CreateGroupExpensePayload } from "../types/groupExpense";
 import { setUserDetail } from "./expenseSlice";
@@ -261,17 +262,17 @@ export const deleteGroupExpenseApi = (groupId: string, expenseId: string) => {
     };
 }
 
-export const getGroupsByUserId = (userId: string) => {
+export const getUserGroups = (userId: string) => {
     return async (dispatch: any) => {
         try {
             dispatch(setIsLoading(true));
-            const result = await serverCall(ENDPOINTS.GET_GROUPS_BY_USER_ID(userId), "GET");
-            console.log("Raw groups by user ID API response:", result);
+            const result = await serverCall(ENDPOINTS.GET_USER_GROUPS(userId), "GET");
+            console.log("#####User groups API response:", result);
             const groupsList = result?.data;
-            dispatch(setGroups(groupsList));
+            dispatch(setUserGroups(groupsList));
             return groupsList;
         } catch (error) {
-            console.error("Error in getGroupsByUserId:", error);
+            console.error("Error in getUserGroups:", error);
             throw error;
         } finally {
             dispatch(setIsLoading(false));

@@ -356,42 +356,6 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
                   <Text style={styles.emptyText}>No diagnostic anomalies detected.</Text>
                 </View>
               )}
-
-              {/* Two-device Root Cause Clues */}
-              <View style={styles.card}>
-                <Text style={styles.cardHeader}>Two-Device Diagnostic Checklist</Text>
-                <Text style={styles.checklistIntro}>
-                  If this request succeeded on one phone but fails on another:
-                </Text>
-                <View style={styles.suggestionRow}>
-                  <Text style={styles.bullet}>1.</Text>
-                  <Text style={styles.suggestionText}>
-                    <Text style={styles.boldText}>Compare Base URLs: </Text>
-                    Current request Base URL is "{log.baseUrl}". Ensure both devices are pointing to Render, not localhost or a private Wi-Fi IP (192.168.x.x).
-                  </Text>
-                </View>
-                <View style={styles.suggestionRow}>
-                  <Text style={styles.bullet}>2.</Text>
-                  <Text style={styles.suggestionText}>
-                    <Text style={styles.boldText}>Compare Firebase UIDs: </Text>
-                    Current UID is "{log.authDiagnostics.firebaseUid || 'None'}". If UIDs differ, the accounts belong to different users.
-                  </Text>
-                </View>
-                <View style={styles.suggestionRow}>
-                  <Text style={styles.bullet}>3.</Text>
-                  <Text style={styles.suggestionText}>
-                    <Text style={styles.boldText}>Render Cold-Start Timeout: </Text>
-                    Render instances spin down after inactivity. Slower connections may time out before Render finishes booting (~50s).
-                  </Text>
-                </View>
-                <View style={styles.suggestionRow}>
-                  <Text style={styles.bullet}>4.</Text>
-                  <Text style={styles.suggestionText}>
-                    <Text style={styles.boldText}>Device Clock Skew: </Text>
-                    Firebase tokens expire or become invalid if the device's clock is inaccurate.
-                  </Text>
-                </View>
-              </View>
             </View>
           )}
 
@@ -460,7 +424,7 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
           {/* TAB 4: RESPONSE DETAILS */}
           {activeTab === 'response' && (
             <View style={styles.sectionContainer}>
-              {/* Response Headers */}
+              {/* Response Headers
               {log.responseHeaders && Object.keys(log.responseHeaders).length > 0 && (
                 <View style={styles.card}>
                   <View style={styles.codeHeaderRow}>
@@ -477,7 +441,7 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
                     </Text>
                   </View>
                 </View>
-              )}
+              )} */}
 
               {/* Response Body */}
               <View style={styles.card}>
@@ -493,7 +457,7 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
                     </TouchableOpacity>
                   )}
                 </View>
-                <View style={styles.codeBlock}>
+                <View style={[styles.codeBlock, {maxHeight: moderateScale(450)}]}>
                   <Text style={styles.codeText} selectable>
                     {log.responseData !== undefined && log.responseData !== null
                       ? typeof log.responseData === 'string'
@@ -754,6 +718,7 @@ const styles = StyleSheet.create({
     marginBottom: moderateScale(10),
   },
   codeBlock: {
+    flex:1,
     backgroundColor: '#0F172A',
     borderRadius: moderateScale(10),
     padding: moderateScale(12),

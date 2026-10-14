@@ -28,4 +28,5 @@ export const ENDPOINTS = {
    GET_GROUP_SETTLEMENTS: (id: number | string) => `/groups/${id}/settlements`,
    GET_GROUP_BALANCES: (id: number | string) => `/groups/${id}/balances`,
    SETTLE_GROUP_EXPENSE: (groupId: number | string, expenseId: number | string) => `/groups/${groupId}/expenses/${expenseId}/settle`,
+   GET_USER_GROUPS: (userID: number | string) => `/groups/usersgroups/${userID}`
 };
