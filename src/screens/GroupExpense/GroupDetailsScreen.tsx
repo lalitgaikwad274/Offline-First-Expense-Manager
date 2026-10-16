@@ -71,7 +71,7 @@ export const GroupDetailsScreen = () => {
   
   const expenses = useAppSelector(getGroupExpenses(groupId));
   const balanceInfo = useAppSelector(getGroupBalances(groupId));
-  const currentUser = useAppSelector((state) => state.groupExpense.currentUser);
+  const currentUser = useAppSelector((state) => state.expense.user);
   const [group, setGroup] = useState<Group | null>(groupData || null);
   const [isLoading, setIsLoading] = useState(!groupData);
   const [activeTab, setActiveTab] = useState<'Expenses' | 'Balances' | 'Members'>('Expenses');
@@ -80,13 +80,11 @@ export const GroupDetailsScreen = () => {
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberPhone, setNewMemberPhone] = useState('');
-  console.log("####groupId : ", groupId);
 
   const getGroupDeatils = async () => {
     try {
       setIsLoading(true);
       const response = await serverCall(ENDPOINTS.GET_GROUP_DETAILS(groupId), "GET");
-      console.log("#######response ", response);
       if (response?.data && Object.keys(response?.data).length > 0) {
         setGroup(response.data);
         if (Array.isArray(response.data.expenses) && response.data.expenses.length > 0) {
@@ -95,7 +93,7 @@ export const GroupDetailsScreen = () => {
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -244,7 +242,7 @@ export const GroupDetailsScreen = () => {
   };
 
   const membersList = Array.isArray(group?.members) ? group.members : [];
-  console.log("####### membersList",membersList)
+
   return (
     <View style={[styles.safeArea, { paddingTop: topInset }]}>
       <StatusBar barStyle="dark-content" />

@@ -61,7 +61,7 @@ export const GroupExpenseDetailsScreen = () => {
 
   const group = useAppSelector(getGroupById(groupId));
   const expense = useAppSelector(getGroupExpenseById(expenseId));
-  const currentUser = useAppSelector((state) => state.groupExpense.currentUser);
+  const currentUser = useAppSelector((state) => state.expense.user);
 
   if (!group || !expense) {
     return (
@@ -78,7 +78,7 @@ export const GroupExpenseDetailsScreen = () => {
   group?.members?.forEach((m) => memberMap.set(String(m.id), m));
   const payerId = String(expense.paidBy || expense.paid_by || '');
   const payer = memberMap.get(payerId);
-  const isPayerMe = payerId === String(currentUser?.id) || payer?.isCurrentUser;
+  const isPayerMe = payerId == currentUser?.id
 
   const participantsList = Array.isArray(expense?.participants) && expense.participants.length > 0
     ? expense.participants
@@ -127,8 +127,6 @@ export const GroupExpenseDetailsScreen = () => {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-                console.log("#####!!! expense", expense)
-
             dispatch(deleteGroupExpenseApi(groupId, expenseId));
             // dispatch(deleteExpense(expense.id));
             navigation.goBack();
@@ -137,7 +135,7 @@ export const GroupExpenseDetailsScreen = () => {
       ]
     );
   };
-console.log("######$#$#$ expense", expense)
+
   return (
     <View style={[styles.safeArea, { paddingTop: topInset }]}>
       <StatusBar barStyle="dark-content" />
@@ -254,7 +252,7 @@ console.log("######$#$#$ expense", expense)
 
           {participantsList.map((p: any, idx: number) => {
             const member = memberMap.get(String(p.userId));
-            const isMe = String(p.userId) === String(currentUser?.id) || member?.isCurrentUser;
+            const isMe = String(member?.user_id) === String(currentUser.id);
             const pAmount = typeof p.amount === 'number' ? p.amount : parseFloat(p.amount) || 0;
             return (
               <View key={p.userId || idx} style={styles.participantRow}>

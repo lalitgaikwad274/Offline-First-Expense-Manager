@@ -58,6 +58,12 @@ const CATEGORIES = [
   'Entertainment',
   'Travel',
   'Health',
+  'Mutual Funds',
+  'Loans',
+  'Credit',
+  'Education',
+  'Subscription',
+  'Rent',
   'Other',
 ];
 

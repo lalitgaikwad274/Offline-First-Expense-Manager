@@ -1,9 +1,9 @@
 import React, { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Car, CloudOff, CreditCard, HeartPulse, Package, Plane, ShoppingBag, Utensils, Zap } from 'lucide-react-native';
-import { Expense, ExpenseCategory } from '../types/expense';
+import { CloudOff } from 'lucide-react-native';
+import { Expense } from '../types/expense';
 import { COLORS, moderateScale } from '../utils/constants';
-import { formatCurrency } from '../utils/helpers';
+import { formatCurrency, getCategoryIcon } from '../utils/helpers';
 
 export interface ExpenseCardProps {
   item?: Expense;
@@ -13,46 +13,6 @@ export interface ExpenseCardProps {
   onPress?: (expense: Expense) => void;
   onLongPress?: (expense: Expense) => void;
 }
-
-const getCategoryIcon = (category: ExpenseCategory) => {
-  switch (category) {
-    case 'Food & Dining':
-      return Utensils;
-    case 'Transport':
-      return Car;
-    case 'Shopping':
-      return ShoppingBag;
-    case 'Bills & Utilities':
-      return Zap;
-    case 'Entertainment':
-      return CreditCard;
-    case 'Health':
-      return HeartPulse;
-    case 'Travel':
-      return Plane;
-    default:
-      return Package;
-  }
-};
-
-const getCategoryColor = (category: ExpenseCategory): string => {
-  switch (category) {
-    case 'Food & Dining':
-      return COLORS.expense;
-    case 'Transport':
-      return COLORS.info;
-    case 'Shopping':
-      return COLORS.warning;
-    case 'Bills & Utilities':
-      return '#8B5CF6';
-    case 'Health':
-      return COLORS.income;
-    case 'Travel':
-      return '#EC4899';
-    default:
-      return COLORS.primary;
-  }
-};
 
 export const ExpenseCard = memo(({
   item,
@@ -65,8 +25,8 @@ export const ExpenseCard = memo(({
   const expenseData = item || expense;
   if (!expenseData) return null;
   const isCredit = expenseData.category === 'Credit';
-  const Icon = getCategoryIcon(expenseData.category);
-  const iconColor = expenseData.color || getCategoryColor(expenseData.category);
+  const category = expenseData.category || 'Other';
+  const { icon: Icon, color: iconColor, bg: iconBg } = getCategoryIcon(category);
   const isRow = variant === 'row';
 
   return (
@@ -82,11 +42,11 @@ export const ExpenseCard = memo(({
       accessibilityLabel={`${expenseData.category}, ${expenseData.amount} rupees`}
     >
       {/* Category Icon */}
-      <View style={[styles.iconWrapper, { backgroundColor: iconColor }]}>
+      <View style={[styles.iconWrapper, { backgroundColor: iconBg }]}>
         <Icon
           size={moderateScale(22)}
-          color={COLORS.white}
-          strokeWidth={2.2}
+          color={iconColor}
+          strokeWidth={2.5}
         />
       </View>
 

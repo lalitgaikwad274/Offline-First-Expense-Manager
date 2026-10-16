@@ -39,8 +39,11 @@ const CATEGORIES: { label: ExpenseCategory; color: string }[] = [
   { label: 'Entertainment', color: '#845EF7' },
   { label: 'Health', color: '#F06595' },
   { label: 'Travel', color: '#20C997' },
-  { label: 'mutual funds', color: '#FF6B6B' },
-  { label: 'Loans', color: '#FF6B6B' },
+  { label: 'Mutual Funds', color: '#FF6B6B' },
+  { label: 'Loans', color: '#ff0cf3ff' },
+  { label: 'Education', color: '#6bffbcff' },
+  { label: 'Subscription', color: '#b79999ff' },
+  { label: 'Rent', color: '#5e24a6ff' },
   { label: 'Other', color: '#868E96' },
 
 ];

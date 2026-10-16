@@ -2,6 +2,7 @@ import { APP_CONFIG } from './constants';
 import { Expense, ExpenseCategory } from '../types/expense';
 import { GroupExpense, ExpenseParticipant, SplitType } from '../types/groupExpense';
 import { ConfirmationResult, getAuth, linkWithCredential, PhoneAuthProvider, signInWithPhoneNumber } from '@react-native-firebase/auth';
+import { Briefcase, Car, Dumbbell, FileText, Fuel, Gamepad2, Gift, GraduationCap, HandCoins, Heart, Home, KeyRound, Leaf, LucideIcon, MoreHorizontal, PawPrint, PieChart, Plane, ShoppingBag, ShoppingCart, Stethoscope, Utensils, Wallet } from 'lucide-react-native';
 
 /**
  * Format a number to currency with Indian Rupee (or configured) symbol
@@ -115,29 +116,118 @@ export const formatTransactionDate = (dateInput?: string | number | Date | null)
 export const getCategoryColor = (category: string): string => {
   switch (category) {
     case 'Food & Dining':
-      return '#F21F38';
+      return '#FEE9EC';
     case 'Transport':
-      return '#1478E8';
+      return '#E4F0FE';
     case 'Shopping':
-      return '#F59E0B';
+      return '#FEF3E6';
     case 'Bills & Utilities':
-      return '#51CF66';
+      return '#F0EBFE';
     case 'Entertainment':
-      return '#845EF7';
+      return '#EFEAFE';
     case 'Health':
-      return '#F06595';
+      return '#E2F7EE';
     case 'Travel':
-      return '#20C997';
+      return '#FEF3E5';
     case 'Credit':
       return '#07566A';
-    case 'mutual funds':
+    case 'Mutual Fund':
+      return '#EEF1FF'
     case 'Loans':
-      return '#FF6B6B';
+      return '#FFF6DC';
+    case 'Groceries':
+      return '#E1F8F9';
+    case 'Subscription':
+      return '#E5F7EF';
+    case 'Fitness':
+      return '#E4F7EE';
+    case 'Fuel':
+      return '#FEECEA';
+    case 'Games':
+      return '#E3F0FE';
+    case 'Work':
+      return '#E4F0FE';
+    case 'Rent':
+      return '#EFEAFE';
+    case 'Education':
+      return '#E5F1FE';
+    case 'Personal':
+      return '#FEECF2';
     default:
-      return '#868E96';
+      return '#F0EAFE';
   }
 };
 
+export const getCategoryIcon = (category: string): {
+  icon: LucideIcon;
+  bg: string;
+  color: string;
+} => {
+  const cat = category.toLowerCase();
+  if (cat.includes('shopping') || cat.includes('shop')) {
+    return { icon: ShoppingBag, bg: '#FFF3E6', color: '#FF7205' };
+  }
+  if (cat.includes('food') || cat.includes('dining') || cat.includes('dinner') || cat.includes('lunch')) {
+    return { icon: Utensils, bg: '#FFE9EC', color: '#FF2B3F' };
+  }
+  if (cat.includes('rent')) {
+    return { icon: KeyRound, bg: '#EFEAFE', color: '#9459FF' };
+  }
+  if (cat.includes('home') || cat.includes('house')) {
+    return { icon: Home, bg: '#E5F8EF', color: '#14A257' };
+  }
+  if (cat.includes('transport') || cat.includes('taxi') || cat.includes('cab')) {
+    return { icon: Car, bg: '#E4F0FE', color: '#3688FF' };
+  }
+  if (cat.includes('entertainment') || cat.includes('movie')) {
+    return { icon: Gift, bg: '#EFEAFE', color: '#9558FF' };
+  }
+  if (cat.includes('travel') || cat.includes('flight') || cat.includes('trip')) {
+    return { icon: Plane, bg: '#FFF3E5', color: '#FF7006' };
+  }
+  if (cat.includes('health') || cat.includes('medical') || cat.includes('doctor')) {
+    return { icon: Stethoscope, bg: '#E2F7EE', color: '#077D41' };
+  }
+  if (cat.includes('personal')) {
+    return { icon: Heart, bg: '#FFECF2', color: '#FF4276' };
+  }
+  if (cat.includes('education') || cat.includes('school') || cat.includes('course')) {
+    return { icon: GraduationCap, bg: '#E5F1FE', color: '#3686FC' };
+  }
+  if (cat.includes('bill') || cat.includes('utilit')) {
+    return { icon: FileText, bg: '#F0EBFE', color: '#9E67FF' };
+  }
+  if (cat.includes('grocer')) {
+    return { icon: ShoppingCart, bg: '#E1F8F9', color: '#0FC6C7' };
+  }
+  if (cat.includes('fitness') || cat.includes('gym')) {
+    return { icon: Dumbbell, bg: '#E4F7EE', color: '#119450' };
+  }
+  if (cat.includes('fuel') || cat.includes('petrol') || cat.includes('gas')) {
+    return { icon: Fuel, bg: '#FFECEA', color: '#FF1E09' };
+  }
+  if (cat.includes('game')) {
+    return { icon: Gamepad2, bg: '#E3F0FE', color: '#408CFF' };
+  }
+  if (cat.includes('work') || cat.includes('office') || cat.includes('business')) {
+    return { icon: Briefcase, bg: '#E4F0FE', color: '#3786FF' };
+  }
+  if (cat.includes('subscription') || cat.includes('netflix') || cat.includes('recurring')) {
+    return { icon: Leaf, bg: '#E5F7EF', color: '#09894E' };
+  }
+
+  if (cat.includes('mutual') || cat.includes('fund') || cat.includes('sip') || cat.includes('invest')) {
+    return { icon: PieChart, bg: '#E8ECFF', color: '#4F5BD5' };
+  }
+  if (cat.includes('loan') || cat.includes('emi') || cat.includes('debt')) {
+    return { icon: HandCoins, bg: '#FFF1CC', color: '#F5A623' };
+  }
+  if (cat.includes('credit')) {
+    return { icon: Wallet, bg: '#e9fff1ff', color: '#1dc563ff' };
+  }
+  // Others / default
+  return { icon: MoreHorizontal, bg: '#F0EAFE', color: '#9659F8' };
+}
 /**
  * Formats any raw transaction (e.g. from backend API) into the standard Expense format:
  * {

@@ -21,7 +21,7 @@ export const CategoryItem = memo(({
   backgroundColor,
   onPress,
 }: CategoryItemProps) => {
-  const iconColor = color || (isPrimary ? COLORS.white : COLORS.navy);
+  const iconColor = color || (isPrimary ? COLORS.expense : COLORS.navy);
 
   return (
     <Pressable
@@ -41,7 +41,7 @@ export const CategoryItem = memo(({
         ]}
       >
         <Icon
-          size={isPrimary ? moderateScale(34) : moderateScale(26)}
+          size={moderateScale(20)}
           color={iconColor}
           strokeWidth={isPrimary ? 2.2 : 2.2}
         />
@@ -63,30 +63,30 @@ export const CategoryItem = memo(({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    width: moderateScale(72),
+    width: moderateScale(58),
   },
   iconContainer: {
-    width: moderateScale(66),
-    height: moderateScale(66),
-    borderRadius: SPACING.iconRadius,
+    width: moderateScale(50),
+    height: moderateScale(50),
+    borderRadius: moderateScale(20),
     backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.88)',
+    borderColor: 'rgba(232, 228, 228, 0.88)',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 6,
+    // elevation: 2,
   },
   primaryIconContainer: {
-    backgroundColor: COLORS.expense,
+    backgroundColor: COLORS.navFabHalo,
     ...SHADOWS.medium,
   },
   title: {
     color: COLORS.navy,
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(11),
     lineHeight: moderateScale(15),
     fontWeight: '700',
     textAlign: 'center',

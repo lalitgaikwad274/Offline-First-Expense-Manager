@@ -6,9 +6,17 @@ export type ExpenseCategory =
   | 'Entertainment'
   | 'Health'
   | 'Travel'
-  | 'mutual funds'
+  | 'Mutual Funds'
   | 'Loans'
   | 'Credit'
+  | 'Education'
+  | 'Subscription'
+  | 'Fitness'
+  | 'Rent'
+  | 'Fuel'
+  | 'Games'
+  | 'Personal'
+  | 'Groceries'
   | 'Other';
 
 export interface Expense {

@@ -23,7 +23,7 @@ export const calculateBalances = (
   members.forEach((m) => memberMap.set(String(m.id), m));
 
   const currentMember =
-    members.find((m) => String(m.id) === String(currentUserId) || m.isCurrentUser) || members[0];
+    members.find((m) => String(m.user_id) === String(currentUserId)) || members[0];
   const effectiveCurrentUserId = currentMember ? String(currentMember.id) : '';
 
   // 1. Initialize stats per member
@@ -53,18 +53,15 @@ export const calculateBalances = (
   });
 
   let totalExpenseAmount = 0;
-  console.log("###### expenses", expenses)
+
   // 2. Process all expenses
   expenses.forEach((expense) => {
     const expAmount = typeof expense.amount === 'number' ? expense.amount : parseFloat(expense.amount) || 0;
-    console.log("#### expAmount", expAmount)
     totalExpenseAmount += expAmount;
     const payerId = String(expense.paidBy || expense.paid_by || '');
 
-    if (totalPaidMap[payerId] !== undefined) {
+    if (payerId && totalPaidMap[payerId] !== undefined) {
       totalPaidMap[payerId] += expAmount;
-    } else {
-      totalPaidMap[payerId] = expAmount;
     }
 
     const participants = (expense.participants && expense.participants.length > 0)
@@ -80,11 +77,9 @@ export const calculateBalances = (
     participants.forEach((p) => {
       const pUserId = String(p.userId);
       const pAmount = typeof p.amount === 'number' ? p.amount : parseFloat(p.amount) || 0;
-      if (totalShareMap[pUserId] !== undefined) {
+      if (pUserId && totalShareMap[pUserId] !== undefined) {
         totalShareMap[pUserId] += pAmount;
-      } else {
-        totalShareMap[pUserId] = pAmount;
-      }
+      } 
 
       // If participant is different from payer, participant owes payer
       if (payerId && pUserId !== payerId) {
@@ -120,8 +115,7 @@ export const calculateBalances = (
     const share = totalShareMap[mId] || 0;
     const settledPaid = settlementsPaidMap[mId] || 0;
     const settledRecv = settlementsReceivedMap[mId] || 0;
-
-    const net = (paid - share) + (settledRecv - settledPaid);
+    const net = paid > 0 ? (paid - share) + (settledRecv - settledPaid) : 0
     netBalances[mId] = Number(net.toFixed(2));
   });
 

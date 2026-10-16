@@ -70,7 +70,7 @@ export const GroupExpenseCard = memo(({
 
   const payerId = String(expense.paidBy || expense.paid_by || '');
   const payer = memberMap.get(payerId);
-  const isPayerMe = payerId === String(currentUserId) || payer?.isCurrentUser;
+  const isPayerMe = payer?.user_id == currentUserId;
   const payerName = isPayerMe ? 'You' : payer?.name?.split(' ')[0] || expense.payer_name || 'Member';
 
   const participants = expense.participants || [];

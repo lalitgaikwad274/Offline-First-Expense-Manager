@@ -26,12 +26,14 @@ import {
   Bug,
 } from 'lucide-react-native';
 import { apiLogger } from '../../services/apiLogger';
-import { useAppSelector } from '../../store';
+import { resetStore, useAppSelector } from '../../store';
 import { COLORS, moderateScale, SHADOWS, APP_CONFIG } from '../../utils/constants';
 import { SCREEN_NAMES } from '../../utils/screenNames';
+// import { useDispatch } from 'react-redux';
 
 const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  // const dispatch = useDispatch();
   const auth = getAuth();
   const currentUser = auth.currentUser;
 
@@ -44,7 +46,7 @@ const ProfileScreen: React.FC = () => {
   const email = currentUser?.email || 'lalit@expensio.app';
   const initial = displayName.charAt(0).toUpperCase();
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
     Alert.alert(
       'Log Out',
       'Are you sure you want to log out of your account?',
@@ -55,6 +57,7 @@ const ProfileScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             try {
+              // dispatch(resetStore());
               await signOut(auth);
             } catch (error: any) {
               Alert.alert('Error', error?.message || 'Failed to log out');

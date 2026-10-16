@@ -8,6 +8,7 @@ import {
 } from '../types/groupExpense';
 import { calculateBalances } from '../utils/groupExpense/calculateBalances';
 import { RootState } from './index';
+import { resetStore } from './actions';
 
 export interface GroupExpenseState {
   groups: Group[];
@@ -188,6 +189,14 @@ export const groupExpenseSlice = createSlice({
     setSettlements: (state, action: PayloadAction<GroupSettlement[]>) => {
       state.settlements = Array.isArray(action.payload) ? action.payload : [];
     },
+    resetGroupExpenseState: () => {
+      return initialState;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(resetStore, () => {
+      return initialState;
+    });
   },
 });
 
@@ -209,6 +218,7 @@ export const {
   setUserGroups,
   setGroupExpenses,
   setSettlements,
+  resetGroupExpenseState,
 } = groupExpenseSlice.actions;
 
 // Selectors
@@ -223,7 +233,7 @@ export const getGroupById = (groupId: string | undefined | null) => (state: Root
 
 export const getGroupExpenses = (groupId: string | undefined | null) => (state: RootState) => {
   const expenses = state.groupExpense?.expenses;
-  console.log("##### expenses", expenses, groupId);
+
   if (!Array.isArray(expenses) || !groupId) return [];
   return expenses.filter(
     (e) =>
@@ -272,7 +282,7 @@ export const getGroupBalances = (groupId: string | undefined | null) => (state: 
   const settlements = Array.isArray(state.groupExpense?.settlements)
     ? state.groupExpense.settlements.filter((s) => s && (s.groupId === groupId || String(s.groupId) === String(groupId)))
     : [];
-  const currentUserId = state.groupExpense?.currentUser?.id || '';
+  const currentUserId = state.expense?.user?.id || '';
 
   return calculateBalances(group, expenses, settlements, currentUserId);
 };

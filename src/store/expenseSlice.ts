@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Expense, UserProfile } from '../types/expense';
 import { BankAccountItem } from '../screens/transactions/BankAccountScreen';
+import { resetStore } from './actions';
 
 export interface ExpenseState {
   expenses: Expense[];
@@ -69,6 +70,14 @@ export const expenseSlice = createSlice({
     setIsLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
+    resetExpenseState: () => {
+      return initialState;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(resetStore, () => {
+      return initialState;
+    });
   },
 });
 
@@ -86,6 +95,7 @@ export const {
   clearNotifications,
   setBankAccounts,
   setIsLoading,
+  resetExpenseState,
 } = expenseSlice.actions;
 
 export default expenseSlice.reducer;
